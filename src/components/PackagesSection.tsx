@@ -8,11 +8,6 @@ import fernadoNoronhaImg from '@/assets/hero-fernando-noronha.jpg';
 import jericoacoaraImg from '@/assets/destination-jericoacoara.jpg';
 import salvadorImg from '@/assets/destination-salvador.jpg';
 import portoGalinhasImg from '@/assets/destination-porto-galinhas.jpg';
-import natalImg from '@/assets/destination-natal.jpg';
-import maragogiImg from '@/assets/destination-maragogi.jpg';
-import canoaQuebradaImg from '@/assets/destination-canoa-quebrada.jpg';
-import praiaDoForteImg from '@/assets/destination-praia-do-forte.jpg';
-import saoLuisImg from '@/assets/destination-sao-luis.jpg';
 
 interface Package {
   id: string;
@@ -107,64 +102,6 @@ const packages: Package[] = [
     highlights: ['5 destinos incríveis', 'Experiência completa', 'Guia durante toda viagem'],
     tag: 'Exclusivo',
     saving: 'Super oferta'
-  },
-  {
-    id: 'natal-adventure',
-    title: 'Natal Aventura & Relax',
-    destination: 'Natal, RN',
-    image: natalImg,
-    duration: '5 dias / 4 noites',
-    groupSize: '2-12 pessoas',
-    price: 'R$ 2.190',
-    rating: 4.5,
-    reviewCount: 198,
-    includes: ['Hotel frente ao mar', 'Passeio de buggy', 'City tour', 'Transfers'],
-    highlights: ['Dunas de Genipabu', 'Forte dos Reis Magos', 'Ponta Negra'],
-    tag: 'Aventura'
-  },
-  {
-    id: 'maragogi-paradise',
-    title: 'Maragogi Paraíso Natural',
-    destination: 'Maragogi, AL',
-    image: maragogiImg,
-    duration: '6 dias / 5 noites',
-    groupSize: '2-8 pessoas',
-    price: 'R$ 3.290',
-    originalPrice: 'R$ 3.690',
-    rating: 4.8,
-    reviewCount: 134,
-    includes: ['Resort beira-mar', 'Passeio aos Galés', 'Mergulho', 'SPA'],
-    highlights: ['Galés de Maragogi', 'Águas cristalinas', 'Caribe brasileiro'],
-    tag: 'Paraíso',
-    saving: 'Promoção'
-  },
-  {
-    id: 'canoa-quebrada-cultural',
-    title: 'Canoa Quebrada Cultural',
-    destination: 'Canoa Quebrada, CE',
-    image: canoaQuebradaImg,
-    duration: '4 dias / 3 noites',
-    groupSize: '2-10 pessoas',
-    price: 'R$ 1.590',
-    rating: 4.6,
-    reviewCount: 167,
-    includes: ['Pousada charmosa', 'Passeio de jangada', 'Aula de artesanato', 'Guia local'],
-    highlights: ['Falésias coloridas', 'Jangadas tradicionais', 'Artesanato local'],
-    tag: 'Cultural'
-  },
-  {
-    id: 'praia-forte-eco',
-    title: 'Praia do Forte Eco Experience',
-    destination: 'Praia do Forte, BA',
-    image: praiaDoForteImg,
-    duration: '4 dias / 3 noites',
-    groupSize: '2-8 pessoas',
-    price: 'R$ 2.090',
-    rating: 4.7,
-    reviewCount: 145,
-    includes: ['Eco resort', 'Projeto Tamar', 'Trilhas ecológicas', 'Bike tour'],
-    highlights: ['Projeto Tamar', 'Vila de pescadores', 'Preservação ambiental'],
-    tag: 'Eco'
   }
 ];
 
@@ -174,18 +111,17 @@ const PackagesSection = () => {
 
   const nextSlide = () => {
     setCurrentIndex((prev) => 
-      prev + packagesPerView >= packages.length ? 0 : prev + packagesPerView
+      prev + packagesPerView >= packages.length ? 0 : prev + 1
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex((prev) => 
-      prev === 0 ? Math.max(0, packages.length - packagesPerView) : prev - packagesPerView
+      prev === 0 ? Math.max(0, packages.length - packagesPerView) : prev - 1
     );
   };
 
   const visiblePackages = packages.slice(currentIndex, currentIndex + packagesPerView);
-  const totalSlides = Math.ceil(packages.length / packagesPerView);
 
   return (
     <section id="pacotes" className="py-20 bg-gradient-to-br from-muted/20 via-background to-muted/30">
@@ -224,23 +160,13 @@ const PackagesSection = () => {
           </button>
 
           {/* Packages Grid */}
-          <div className="mx-12 overflow-hidden">
-            <div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-700 ease-in-out"
-              style={{ 
-                transform: `translateX(${currentIndex * -100 / packagesPerView}%)`,
-                width: `${(packages.length / packagesPerView) * 100}%`
-              }}
-            >
-              {packages.map((pkg, index) => (
+          <div className="mx-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {visiblePackages.map((pkg, index) => (
                 <div 
                   key={pkg.id}
-                  className="card-destination hover-lift cursor-pointer group transition-all duration-300"
-                  style={{ 
-                    minWidth: `${100 / packagesPerView}%`,
-                    opacity: Math.abs(index - currentIndex) < packagesPerView ? 1 : 0.7,
-                    transform: Math.abs(index - currentIndex) < packagesPerView ? 'scale(1)' : 'scale(0.95)'
-                  }}
+                  className="card-destination hover-lift cursor-pointer animate-scale-in group"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Image Container */}
                   <div className="relative overflow-hidden h-56">
@@ -364,15 +290,15 @@ const PackagesSection = () => {
           </div>
 
           {/* Indicators */}
-          <div className="flex justify-center mt-8 space-x-3">
-            {Array.from({ length: totalSlides }).map((_, index) => (
+          <div className="flex justify-center mt-8 space-x-2">
+            {Array.from({ length: Math.ceil(packages.length / packagesPerView) }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index * packagesPerView)}
-                className={`transition-all duration-500 ease-out ${
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   Math.floor(currentIndex / packagesPerView) === index
-                    ? 'w-8 h-3 bg-gradient-to-r from-primary to-accent rounded-full shadow-lg transform scale-110' 
-                    : 'w-3 h-3 bg-muted hover:bg-primary/60 rounded-full hover:scale-110'
+                    ? 'bg-primary scale-125' 
+                    : 'bg-muted hover:bg-primary/50'
                 }`}
               />
             ))}
