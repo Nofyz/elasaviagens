@@ -89,64 +89,6 @@ const HeroSection = () => {
                 <Search className="h-5 w-5 mr-2" />
                 Explorar Destinos
               </Button>
-              <Button variant="outline" className="bg-white/10 border-white/30 text-white hover:bg-white/20 px-8 py-4 text-lg animate-scale-in backdrop-blur-sm">
-                <Calendar className="h-5 w-5 mr-2" />
-                Solicitar Orçamento
-              </Button>
-            </div>
-
-            {/* Quick Search Bar */}
-            <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 animate-slide-up">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Destino</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      placeholder="Onde você quer ir?"
-                      className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Check-in</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      type="date"
-                      className="pl-10 bg-white/20 border-white/30 text-white"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Check-out</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      type="date"
-                      className="pl-10 bg-white/20 border-white/30 text-white"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">Viajantes</label>
-                  <div className="relative">
-                    <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      placeholder="2 adultos"
-                      className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <Button className="w-full mt-6 btn-secondary-hero">
-                <Search className="h-5 w-5 mr-2" />
-                Buscar Pacotes
-              </Button>
             </div>
           </div>
         </div>
