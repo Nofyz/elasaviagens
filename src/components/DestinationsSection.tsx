@@ -11,6 +11,9 @@ import portoGalinhasImg from '@/assets/destination-porto-galinhas.jpg';
 import natalImg from '@/assets/destination-natal.jpg';
 import maragogiImg from '@/assets/destination-maragogi.jpg';
 import fernadoNoronhaImg from '@/assets/hero-fernando-noronha.jpg';
+import canoaQuebradaImg from '@/assets/destination-canoa-quebrada.jpg';
+import praiaDoForteImg from '@/assets/destination-praia-do-forte.jpg';
+import saoLuisImg from '@/assets/destination-sao-luis.jpg';
 
 interface Destination {
   id: string;
@@ -105,6 +108,43 @@ const destinations: Destination[] = [
     highlights: ['Galés de Maragogi', 'Águas cristalinas', 'Caribe brasileiro'],
     category: 'Paraíso Natural',
     exclusive: true
+  },
+  {
+    id: 'canoa-quebrada',
+    name: 'Canoa Quebrada',
+    state: 'Ceará',
+    image: canoaQuebradaImg,
+    rating: 4.6,
+    reviewCount: 189,
+    duration: '3-4 dias',
+    price: 'R$ 1.190',
+    highlights: ['Falésias coloridas', 'Jangadas tradicionais', 'Artesanato local'],
+    category: 'Praia & Cultura'
+  },
+  {
+    id: 'praia-do-forte',
+    name: 'Praia do Forte',
+    state: 'Bahia',
+    image: praiaDoForteImg,
+    rating: 4.5,
+    reviewCount: 267,
+    duration: '3-5 dias',
+    price: 'R$ 1.490',
+    highlights: ['Projeto Tamar', 'Vila de pescadores', 'Águas mornas'],
+    category: 'Natureza & Família',
+    popular: true
+  },
+  {
+    id: 'sao-luis',
+    name: 'São Luís',
+    state: 'Maranhão',
+    image: saoLuisImg,
+    rating: 4.4,
+    reviewCount: 152,
+    duration: '2-4 dias',
+    price: 'R$ 1.090',
+    highlights: ['Centro histórico UNESCO', 'Azulejos portugueses', 'Reggae maranhense'],
+    category: 'Cultura & História'
   }
 ];
 
