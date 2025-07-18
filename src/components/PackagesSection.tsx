@@ -165,7 +165,7 @@ const PackagesSection = () => {
               {visiblePackages.map((pkg, index) => (
                 <div 
                   key={pkg.id}
-                  className="card-destination hover-lift cursor-pointer animate-scale-in group"
+                  className="card-destination cursor-pointer animate-scale-in group relative transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Image Container */}
