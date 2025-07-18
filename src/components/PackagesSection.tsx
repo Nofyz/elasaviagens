@@ -107,18 +107,25 @@ const packages: Package[] = [
 
 const PackagesSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const packagesPerView = 3;
 
   const nextSlide = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setCurrentIndex((prev) => 
       prev + packagesPerView >= packages.length ? 0 : prev + 1
     );
+    setTimeout(() => setIsTransitioning(false), 600);
   };
 
   const prevSlide = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setCurrentIndex((prev) => 
       prev === 0 ? Math.max(0, packages.length - packagesPerView) : prev - 1
     );
+    setTimeout(() => setIsTransitioning(false), 600);
   };
 
   const visiblePackages = packages.slice(currentIndex, currentIndex + packagesPerView);
@@ -160,13 +167,24 @@ const PackagesSection = () => {
           </button>
 
           {/* Packages Grid */}
-          <div className="mx-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="mx-12 overflow-hidden">
+            <div 
+              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-600 ease-out ${
+                isTransitioning ? 'transform translate-x-4 opacity-0' : 'transform translate-x-0 opacity-100'
+              }`}
+            >
               {visiblePackages.map((pkg, index) => (
                 <div 
-                  key={pkg.id}
-                  className="card-destination cursor-pointer animate-scale-in group relative transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  key={`${pkg.id}-${currentIndex}`}
+                  className={`card-destination cursor-pointer group relative transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2 ${
+                    isTransitioning 
+                      ? 'animate-slide-out-right opacity-0' 
+                      : 'animate-slide-in-right opacity-100'
+                  }`}
+                  style={{ 
+                    animationDelay: isTransitioning ? `${index * 0.05}s` : `${index * 0.1}s`,
+                    animationFillMode: 'both'
+                  }}
                 >
                   {/* Image Container */}
                   <div className="relative overflow-hidden h-56">
