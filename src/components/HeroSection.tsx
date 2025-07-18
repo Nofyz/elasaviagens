@@ -3,9 +3,9 @@ import { ChevronLeft, ChevronRight, Calendar, Users, MapPin, Search } from 'luci
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import heroImage from '@/assets/hero-fernando-noronha.jpg';
-import heroOceanWave from '@/assets/hero-ocean-wave.jpg';
-import heroTropicalNature from '@/assets/hero-tropical-nature.jpg';
-import heroSunsetBeach from '@/assets/hero-sunset-beach.jpg';
+import heroJericoacoaraDunes from '@/assets/hero-jericoacoara-dunes.jpg';
+import heroSalvadorPelourinho from '@/assets/hero-salvador-pelourinho.jpg';
+import heroNatalBeach from '@/assets/hero-natal-beach.jpg';
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -19,18 +19,18 @@ const HeroSection = () => {
       highlight: "A partir de R$ 2.890"
     },
     {
-      image: heroOceanWave,
-      title: "Experiências Autênticas e Exclusivas",
-      subtitle: "Curadoria Especializada",
-      description: "Roteiros personalizados, guias locais experientes e acesso a experiências únicas que só o Nordeste pode oferecer.",
-      highlight: "Consulte nossos especialistas"
+      image: heroJericoacoaraDunes,
+      title: "Aventura nas Dunas e Lagoas",
+      subtitle: "Jericoacoara - Ceará",
+      description: "Entre dunas douradas e lagoas de águas azul-turquesa, viva experiências únicas no coração do sertão cearense.",
+      highlight: "Pacotes a partir de R$ 1.890"
     },
     {
-      image: heroSunsetBeach,
-      title: "Momentos Inesquecíveis",
-      subtitle: "Suas Próximas Férias",
-      description: "Do litoral paradisíaco às tradições culturais, cada destino nordestino tem uma história única para contar.",
-      highlight: "Planeje sua jornada"
+      image: heroSalvadorPelourinho,
+      title: "História e Cultura Afro-Brasileira",
+      subtitle: "Salvador - Bahia",
+      description: "Mergulhe na rica herança cultural baiana, entre casarões coloniais, música e gastronomia que encantam o mundo.",
+      highlight: "Roteiros culturais únicos"
     }
   ];
 
