@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Star, Calendar, Users, MapPin, Plane, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TravelButton } from '@/components/ui/travel-button';
 import { Badge } from '@/components/ui/badge';
 
 // Import destination images
@@ -307,12 +308,9 @@ const PackagesSection = () => {
 
         {/* Call to Action */}
         <div className="text-center mt-16 animate-fade-in-up">
-          <Button className="btn-accent hover-glow group relative overflow-hidden">
-            <Plane className="h-5 w-5 mr-2 transition-all duration-500 ease-out group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:scale-110" />
-            <span className="relative z-10">Ver Todos os Pacotes</span>
-            {/* Flying plane animation */}
-            <Plane className="h-5 w-5 absolute opacity-0 -translate-x-12 -translate-y-12 group-hover:opacity-100 group-hover:translate-x-[200px] group-hover:translate-y-[200px] transition-all duration-1000 ease-out pointer-events-none text-white/30" />
-          </Button>
+          <TravelButton>
+            Ver Todos os Pacotes
+          </TravelButton>
         </div>
       </div>
     </section>
