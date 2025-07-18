@@ -105,7 +105,7 @@ const TestimonialsSection = () => {
           <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
           
           {/* Carousel container */}
-          <div className="overflow-hidden py-8">
+          <div className="overflow-hidden py-12 pb-16">
             <div 
               className="flex transition-transform duration-1000 ease-in-out gap-8"
               style={{
