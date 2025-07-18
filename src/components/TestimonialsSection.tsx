@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { Quote, Star } from 'lucide-react';
+import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const TestimonialsSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -66,6 +67,14 @@ const TestimonialsSection = () => {
     return () => clearInterval(timer);
   }, [testimonials.length]);
 
+  const goToNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const goToPrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
   const getVisibleTestimonials = () => {
     const startIndex = currentSlide;
     const visibleItems = [];
@@ -103,6 +112,21 @@ const TestimonialsSection = () => {
           {/* Fade overlays */}
           <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+          
+          {/* Navigation Arrows */}
+          <button
+            onClick={goToPrevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white shadow-lg hover:shadow-xl rounded-full p-3 transition-all duration-300 hover:scale-110 group"
+          >
+            <ChevronLeft className="h-6 w-6 text-primary group-hover:text-secondary transition-colors" />
+          </button>
+          
+          <button
+            onClick={goToNextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white shadow-lg hover:shadow-xl rounded-full p-3 transition-all duration-300 hover:scale-110 group"
+          >
+            <ChevronRight className="h-6 w-6 text-primary group-hover:text-secondary transition-colors" />
+          </button>
           
           {/* Carousel container */}
           <div className="overflow-hidden py-12 pb-16">
