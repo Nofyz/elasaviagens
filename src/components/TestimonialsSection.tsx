@@ -105,7 +105,7 @@ const TestimonialsSection = () => {
           <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
           
           {/* Carousel container */}
-          <div className="overflow-hidden">
+          <div className="overflow-hidden py-4">
             <div 
               className="flex transition-transform duration-1000 ease-in-out gap-8"
               style={{
@@ -115,7 +115,7 @@ const TestimonialsSection = () => {
               {extendedTestimonials.map((testimonial, index) => (
                 <div
                   key={`${testimonial.id}-${index}`}
-                  className="flex-shrink-0 w-full md:w-1/3 px-4"
+                  className="flex-shrink-0 w-full md:w-1/3 px-6"
                 >
                   <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-border/50 h-full">
                     {/* Quote icon */}
