@@ -181,17 +181,32 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Indicators */}
-        <div className="flex justify-center gap-2 mt-12">
+        <div className="flex justify-center gap-3 mt-12">
           {testimonials.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              className={`relative group transition-all duration-500 ease-out ${
                 index === currentSlide 
-                  ? 'bg-primary scale-125' 
-                  : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  ? 'w-8 h-3' 
+                  : 'w-3 h-3 hover:scale-125'
               }`}
-            />
+            >
+              {/* Background dot */}
+              <div className={`absolute inset-0 rounded-full transition-all duration-500 ${
+                index === currentSlide
+                  ? 'bg-gradient-ocean opacity-100'
+                  : 'bg-muted-foreground/20 group-hover:bg-muted-foreground/40'
+              }`} />
+              
+              {/* Active indicator glow */}
+              {index === currentSlide && (
+                <div className="absolute inset-0 rounded-full bg-gradient-ocean blur-sm opacity-50 animate-pulse" />
+              )}
+              
+              {/* Hover ripple effect */}
+              <div className="absolute inset-0 rounded-full bg-primary/20 scale-0 group-hover:scale-150 transition-transform duration-300 opacity-0 group-hover:opacity-100" />
+            </button>
           ))}
         </div>
 
