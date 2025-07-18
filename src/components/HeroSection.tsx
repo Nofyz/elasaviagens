@@ -3,6 +3,9 @@ import { ChevronLeft, ChevronRight, Calendar, Users, MapPin, Search } from 'luci
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import heroImage from '@/assets/hero-fernando-noronha.jpg';
+import heroOceanWave from '@/assets/hero-ocean-wave.jpg';
+import heroTropicalNature from '@/assets/hero-tropical-nature.jpg';
+import heroSunsetBeach from '@/assets/hero-sunset-beach.jpg';
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -16,14 +19,14 @@ const HeroSection = () => {
       highlight: "A partir de R$ 2.890"
     },
     {
-      image: heroImage,
+      image: heroOceanWave,
       title: "Experiências Autênticas e Exclusivas",
       subtitle: "Curadoria Especializada",
       description: "Roteiros personalizados, guias locais experientes e acesso a experiências únicas que só o Nordeste pode oferecer.",
       highlight: "Consulte nossos especialistas"
     },
     {
-      image: heroImage,
+      image: heroSunsetBeach,
       title: "Momentos Inesquecíveis",
       subtitle: "Suas Próximas Férias",
       description: "Do litoral paradisíaco às tradições culturais, cada destino nordestino tem uma história única para contar.",
@@ -34,7 +37,7 @@ const HeroSection = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 6000);
+    }, 7000); // Increased duration for better image appreciation
 
     return () => clearInterval(timer);
   }, [heroSlides.length]);
@@ -49,15 +52,27 @@ const HeroSection = () => {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* Background Images with Crossfade Transition */}
       <div className="absolute inset-0">
-        <img 
-          src={heroSlides[currentSlide].image} 
-          alt={heroSlides[currentSlide].subtitle}
-          className="w-full h-full object-cover transition-all duration-1000"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        {heroSlides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <img 
+              src={slide.image} 
+              alt={slide.subtitle}
+              className="w-full h-full object-cover scale-105 transition-transform duration-[8000ms] ease-out"
+              style={{
+                transform: index === currentSlide ? 'scale(1.02)' : 'scale(1.05)'
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          </div>
+        ))}
       </div>
 
       {/* Content */}
