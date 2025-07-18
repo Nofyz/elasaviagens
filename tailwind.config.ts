@@ -61,7 +61,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				'ocean-blue': 'hsl(var(--ocean-blue))',
+				'coral': 'hsl(var(--coral))',
+				'sunset-gold': 'hsl(var(--sunset-gold))',
+				'beach-sand': 'hsl(var(--beach-sand))'
+			},
+			fontFamily: {
+				'montserrat': ['Montserrat', 'sans-serif'],
+				'inter': ['Inter', 'sans-serif'],
+				'dancing': ['Dancing Script', 'cursive']
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +93,46 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-20px)' }
+				},
+				'slide-up': {
+					'from': { transform: 'translateY(50px)', opacity: '0' },
+					'to': { transform: 'translateY(0)', opacity: '1' }
+				},
+				'fade-in-up': {
+					'from': { transform: 'translateY(30px)', opacity: '0' },
+					'to': { transform: 'translateY(0)', opacity: '1' }
+				},
+				'scale-in': {
+					'from': { transform: 'scale(0.9)', opacity: '0' },
+					'to': { transform: 'scale(1)', opacity: '1' }
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '-200% 0' },
+					'100%': { backgroundPosition: '200% 0' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'slide-up': 'slide-up 0.8s ease-out forwards',
+				'fade-in-up': 'fade-in-up 1s ease-out forwards',
+				'scale-in': 'scale-in 0.6s ease-out forwards',
+				'shimmer': 'shimmer 2s linear infinite'
+			},
+			backgroundImage: {
+				'gradient-ocean': 'var(--gradient-ocean)',
+				'gradient-sunset': 'var(--gradient-sunset)',
+				'gradient-paradise': 'var(--gradient-paradise)'
+			},
+			boxShadow: {
+				'ocean': 'var(--shadow-ocean)',
+				'warm': 'var(--shadow-warm)',
+				'glow': 'var(--shadow-glow)'
 			}
 		}
 	},
