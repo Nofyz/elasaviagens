@@ -1,9 +1,10 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Quote, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const TestimonialsSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const testimonials = [
     {
@@ -59,20 +60,32 @@ const TestimonialsSection = () => {
   // Create infinite scroll effect by duplicating testimonials
   const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials];
 
-  useEffect(() => {
-    const timer = setInterval(() => {
+  const startAutoSlide = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    timerRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % testimonials.length);
     }, 4000);
+  };
 
-    return () => clearInterval(timer);
+  useEffect(() => {
+    startAutoSlide();
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [testimonials.length]);
 
   const goToNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % testimonials.length);
+    startAutoSlide(); // Reset timer
   };
 
   const goToPrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    startAutoSlide(); // Reset timer
   };
 
   const getVisibleTestimonials = () => {
@@ -185,7 +198,10 @@ const TestimonialsSection = () => {
           {testimonials.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentSlide(index)}
+              onClick={() => {
+                setCurrentSlide(index);
+                startAutoSlide(); // Reset timer
+              }}
               className={`relative group transition-all duration-500 ease-out ${
                 index === currentSlide 
                   ? 'w-8 h-3' 
