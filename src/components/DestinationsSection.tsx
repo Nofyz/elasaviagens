@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Star, Clock, Heart, ChevronRight } from 'lucide-react';
+import { MapPin, Star, Clock, Heart, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -151,6 +151,11 @@ const destinations: Destination[] = [
 const DestinationsSection = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [currentGroup, setCurrentGroup] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  
+  const destinationsPerGroup = 3;
+  const totalGroups = Math.ceil(destinations.length / destinationsPerGroup);
 
   const toggleFavorite = (destinationId: string) => {
     const newFavorites = new Set(favorites);
@@ -164,6 +169,25 @@ const DestinationsSection = () => {
 
   const handleDestinationClick = (destination: Destination) => {
     navigate(`/destino/${destination.id}`);
+  };
+
+  const nextGroup = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentGroup((prev) => (prev + 1) % totalGroups);
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
+  const prevGroup = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setCurrentGroup((prev) => (prev - 1 + totalGroups) % totalGroups);
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
+  const getCurrentDestinations = () => {
+    const startIndex = currentGroup * destinationsPerGroup;
+    return destinations.slice(startIndex, startIndex + destinationsPerGroup);
   };
 
   return (
@@ -183,9 +207,53 @@ const DestinationsSection = () => {
           </p>
         </div>
 
+        {/* Navigation Controls */}
+        <div className="flex justify-between items-center mb-8">
+          <button
+            onClick={prevGroup}
+            disabled={isAnimating}
+            className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="h-6 w-6 text-primary" />
+          </button>
+          
+          <div className="flex gap-2">
+            {Array.from({ length: totalGroups }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (!isAnimating) {
+                    setIsAnimating(true);
+                    setCurrentGroup(index);
+                    setTimeout(() => setIsAnimating(false), 500);
+                  }
+                }}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  index === currentGroup
+                    ? 'bg-primary scale-125'
+                    : 'bg-white/30 hover:bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={nextGroup}
+            disabled={isAnimating}
+            className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="h-6 w-6 text-primary" />
+          </button>
+        </div>
+
         {/* Destinations Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {destinations.map((destination, index) => (
+        <div className="relative overflow-hidden mb-12">
+          <div 
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 ease-in-out ${
+              isAnimating ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
+            }`}
+          >
+            {getCurrentDestinations().map((destination, index) => (
             <div 
               key={destination.id}
               className="card-destination hover-lift cursor-pointer animate-scale-in group"
@@ -305,7 +373,8 @@ const DestinationsSection = () => {
                 </Button>
               </div>
             </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Call to Action */}
