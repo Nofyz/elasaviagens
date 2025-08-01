@@ -62,6 +62,7 @@ export default function RegisterDestination() {
   };
 
   const onSubmit = async (data: DestinationForm) => {
+    console.log('Form submitted with data:', data);
     setIsSubmitting(true);
     
     try {
@@ -105,9 +106,14 @@ export default function RegisterDestination() {
       };
       
       // Inserir no banco de dados
-      const { error: insertError } = await supabase
+      console.log('Inserting data:', destinationData);
+      const { data: insertResult, error: insertError } = await supabase
         .from('destinations')
-        .insert([destinationData]);
+        .insert([destinationData])
+        .select();
+        
+      console.log('Insert result:', insertResult);
+      console.log('Insert error:', insertError);
         
       if (insertError) {
         throw insertError;
