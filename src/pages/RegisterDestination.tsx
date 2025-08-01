@@ -27,6 +27,11 @@ const destinationSchema = z.object({
   price: z.string().min(1, "Preço é obrigatório"),
   duration: z.string().min(1, "Duração é obrigatória"),
   highlights: z.string().min(10, "Destaques devem ter pelo menos 10 caracteres"),
+  minPeople: z.string().min(1, "Número mínimo de pessoas é obrigatório"),
+  maxPeople: z.string().min(1, "Número máximo de pessoas é obrigatório"),
+  rating: z.string().min(1, "Avaliação é obrigatória"),
+  reviewCount: z.string().min(1, "Número de avaliações é obrigatório"),
+  includedItems: z.string().min(10, "Itens inclusos devem ter pelo menos 10 caracteres"),
   image: z.any().optional(),
 });
 
@@ -46,6 +51,11 @@ export default function RegisterDestination() {
       price: "",
       duration: "",
       highlights: "",
+      minPeople: "",
+      maxPeople: "",
+      rating: "",
+      reviewCount: "",
+      includedItems: "",
     },
   });
 
@@ -96,6 +106,11 @@ export default function RegisterDestination() {
         .map(h => h.trim())
         .filter(h => h.length > 0);
       
+      const includedItemsArray = data.includedItems
+        .split(/[,\n]/)
+        .map(item => item.trim())
+        .filter(item => item.length > 0);
+      
       const destinationData = {
         name: data.name,
         location: data.location,
@@ -103,6 +118,11 @@ export default function RegisterDestination() {
         price: parseFloat(data.price.replace(/[^\d.,]/g, '').replace(',', '.')) || 0,
         duration: parseInt(data.duration.replace(/\D/g, '')) || 1,
         highlights: highlightsArray,
+        min_people: parseInt(data.minPeople.replace(/\D/g, '')) || 1,
+        max_people: parseInt(data.maxPeople.replace(/\D/g, '')) || 10,
+        rating: parseFloat(data.rating.replace(/[^\d.,]/g, '').replace(',', '.')) || 5.0,
+        review_count: parseInt(data.reviewCount.replace(/\D/g, '')) || 0,
+        included_items: includedItemsArray,
         image_url: imageUrl
       };
       
@@ -229,6 +249,68 @@ export default function RegisterDestination() {
                     />
                   </div>
 
+                  {/* Número de Pessoas */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="minPeople"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mínimo de Pessoas</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: 2" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="maxPeople"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Máximo de Pessoas</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: 10" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Avaliação */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="rating"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Avaliação (1-5)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: 4.8" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="reviewCount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Número de Avaliações</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: 150" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   {/* Descrição */}
                   <FormField
                     control={form.control}
@@ -264,6 +346,28 @@ export default function RegisterDestination() {
                         </FormControl>
                         <FormDescription>
                           Separe os destaques por vírgula ou quebra de linha
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Itens Inclusos */}
+                  <FormField
+                    control={form.control}
+                    name="includedItems"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Itens Inclusos</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Hospedagem, Alimentação, Transporte, Passeios..."
+                            className="min-h-[80px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Separe os itens inclusos por vírgula ou quebra de linha
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
