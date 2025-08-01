@@ -429,12 +429,12 @@ const PackagesSection = () => {
 
                       {/* CTA Buttons */}
                       <div className="space-y-2">
-                        <Button className="w-full">
-                          <Plane className="h-4 w-4 mr-2" />
+                        <Button className="w-full group/btn hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300">
+                          <Plane className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform duration-300" />
                           Ver Detalhes
                         </Button>
-                        <Button variant="outline" className="w-full text-sm">
-                          {item.type === 'package' ? 'Solicitar Orçamento' : 'Favoritar'}
+                        <Button variant="outline" className="w-full text-sm hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-[1.02] transition-all duration-300">
+                          {item.type === 'package' ? 'Solicitar Orçamento' : 'Fazer Orçamento'}
                         </Button>
                       </div>
                     </div>
