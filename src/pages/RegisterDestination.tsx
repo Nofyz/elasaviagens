@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const destinationSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -64,11 +65,53 @@ export default function RegisterDestination() {
     setIsSubmitting(true);
     
     try {
-      // Aqui você implementaria a lógica de envio para o Supabase
-      console.log("Dados do destino:", data);
+      let imageUrl = null;
       
-      // Simulação de envio
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Upload da imagem se existir
+      if (data.image) {
+        const fileExt = data.image.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('destinations')
+          .upload(fileName, data.image);
+          
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        // Obter a URL pública da imagem
+        const { data: { publicUrl } } = supabase.storage
+          .from('destinations')
+          .getPublicUrl(fileName);
+          
+        imageUrl = publicUrl;
+      }
+      
+      // Preparar dados para inserção
+      const highlightsArray = data.highlights
+        .split(/[,\n]/)
+        .map(h => h.trim())
+        .filter(h => h.length > 0);
+      
+      const destinationData = {
+        name: data.name,
+        location: data.location,
+        description: data.description,
+        price: parseFloat(data.price.replace(/[^\d.,]/g, '').replace(',', '.')),
+        duration: parseInt(data.duration.replace(/\D/g, '')),
+        highlights: highlightsArray,
+        image_url: imageUrl
+      };
+      
+      // Inserir no banco de dados
+      const { error: insertError } = await supabase
+        .from('destinations')
+        .insert([destinationData]);
+        
+      if (insertError) {
+        throw insertError;
+      }
       
       toast({
         title: "Destino registrado com sucesso!",
@@ -78,6 +121,7 @@ export default function RegisterDestination() {
       form.reset();
       setImagePreview(null);
     } catch (error) {
+      console.error('Erro ao registrar destino:', error);
       toast({
         title: "Erro ao registrar destino",
         description: "Tente novamente mais tarde.",

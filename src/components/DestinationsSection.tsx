@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Star, Clock, Heart, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
 
 // Import destination images
 import jericoacoaraImg from '@/assets/destination-jericoacoara.jpg';
@@ -18,134 +19,20 @@ import saoLuisImg from '@/assets/destination-sao-luis.jpg';
 interface Destination {
   id: string;
   name: string;
-  state: string;
-  image: string;
-  rating: number;
-  reviewCount: number;
-  duration: string;
-  price: string;
-  originalPrice?: string;
+  location: string;
+  description: string;
+  price: number;
+  duration: number;
   highlights: string[];
-  category: string;
-  popular?: boolean;
-  exclusive?: boolean;
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
-const destinations: Destination[] = [
-  {
-    id: 'fernando-noronha',
-    name: 'Fernando de Noronha',
-    state: 'Pernambuco',
-    image: fernadoNoronhaImg,
-    rating: 4.9,
-    reviewCount: 312,
-    duration: '5-7 dias',
-    price: 'R$ 2.890',
-    originalPrice: 'R$ 3.490',
-    highlights: ['Mergulho com golfinhos', 'Praias paradisíacas', 'Vida marinha única'],
-    category: 'Paraíso Natural',
-    popular: true,
-    exclusive: true
-  },
-  {
-    id: 'jericoacoara',
-    name: 'Jericoacoara',
-    state: 'Ceará',
-    image: jericoacoaraImg,
-    rating: 4.8,
-    reviewCount: 287,
-    duration: '4-6 dias',
-    price: 'R$ 1.690',
-    highlights: ['Dunas de areia', 'Pôr do sol na duna', 'Kitesurf'],
-    category: 'Aventura & Relax',
-    popular: true
-  },
-  {
-    id: 'salvador',
-    name: 'Salvador',
-    state: 'Bahia',
-    image: salvadorImg,
-    rating: 4.7,
-    reviewCount: 431,
-    duration: '3-5 dias',
-    price: 'R$ 1.290',
-    highlights: ['Pelourinho histórico', 'Cultura afro-brasileira', 'Gastronomia baiana'],
-    category: 'Cultura & História'
-  },
-  {
-    id: 'porto-galinhas',
-    name: 'Porto de Galinhas',
-    state: 'Pernambuco',
-    image: portoGalinhasImg,
-    rating: 4.6,
-    reviewCount: 356,
-    duration: '4-6 dias',
-    price: 'R$ 1.590',
-    highlights: ['Piscinas naturais', 'Mergulho com peixes', 'Resorts de qualidade'],
-    category: 'Praia & Família'
-  },
-  {
-    id: 'natal',
-    name: 'Natal',
-    state: 'Rio Grande do Norte',
-    image: natalImg,
-    rating: 4.5,
-    reviewCount: 298,
-    duration: '4-5 dias',
-    price: 'R$ 1.390',
-    highlights: ['Dunas de Genipabu', 'Forte dos Reis Magos', 'Passeio de buggy'],
-    category: 'Aventura & Cultura'
-  },
-  {
-    id: 'maragogi',
-    name: 'Maragogi',
-    state: 'Alagoas',
-    image: maragogiImg,
-    rating: 4.8,
-    reviewCount: 203,
-    duration: '3-5 dias',
-    price: 'R$ 1.790',
-    highlights: ['Galés de Maragogi', 'Águas cristalinas', 'Caribe brasileiro'],
-    category: 'Paraíso Natural',
-    exclusive: true
-  },
-  {
-    id: 'canoa-quebrada',
-    name: 'Canoa Quebrada',
-    state: 'Ceará',
-    image: canoaQuebradaImg,
-    rating: 4.6,
-    reviewCount: 189,
-    duration: '3-4 dias',
-    price: 'R$ 1.190',
-    highlights: ['Falésias coloridas', 'Jangadas tradicionais', 'Artesanato local'],
-    category: 'Praia & Cultura'
-  },
-  {
-    id: 'praia-do-forte',
-    name: 'Praia do Forte',
-    state: 'Bahia',
-    image: praiaDoForteImg,
-    rating: 4.5,
-    reviewCount: 267,
-    duration: '3-5 dias',
-    price: 'R$ 1.490',
-    highlights: ['Projeto Tamar', 'Vila de pescadores', 'Águas mornas'],
-    category: 'Natureza & Família',
-    popular: true
-  },
-  {
-    id: 'sao-luis',
-    name: 'São Luís',
-    state: 'Maranhão',
-    image: saoLuisImg,
-    rating: 4.4,
-    reviewCount: 152,
-    duration: '2-4 dias',
-    price: 'R$ 1.090',
-    highlights: ['Centro histórico UNESCO', 'Azulejos portugueses', 'Reggae maranhense'],
-    category: 'Cultura & História'
-  }
+// Fallback images for destinations without images
+const fallbackImages = [
+  jericoacoaraImg, salvadorImg, portoGalinhasImg, natalImg, 
+  maragogiImg, fernadoNoronhaImg, canoaQuebradaImg, praiaDoForteImg, saoLuisImg
 ];
 
 const DestinationsSection = () => {
@@ -153,9 +40,35 @@ const DestinationsSection = () => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [currentGroup, setCurrentGroup] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const destinationsPerGroup = 3;
   const totalGroups = Math.ceil(destinations.length / destinationsPerGroup);
+
+  // Fetch destinations from Supabase
+  useEffect(() => {
+    const fetchDestinations = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('destinations')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (error) {
+          console.error('Error fetching destinations:', error);
+        } else {
+          setDestinations(data || []);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDestinations();
+  }, []);
 
   const toggleFavorite = (destinationId: string) => {
     const newFavorites = new Set(favorites);
@@ -189,6 +102,39 @@ const DestinationsSection = () => {
     const startIndex = currentGroup * destinationsPerGroup;
     return destinations.slice(startIndex, startIndex + destinationsPerGroup);
   };
+
+  const getDestinationImage = (destination: Destination, index: number) => {
+    return destination.image_url || fallbackImages[index % fallbackImages.length];
+  };
+
+  if (loading) {
+    return (
+      <section id="destinos" className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-lg text-muted-foreground">Carregando destinos...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (destinations.length === 0) {
+    return (
+      <section id="destinos" className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="font-montserrat font-bold text-4xl md:text-5xl mb-6 text-gradient-ocean">
+              Nenhum destino encontrado
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              Seja o primeiro a adicionar um destino incrível!
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="destinos" className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
@@ -263,7 +209,7 @@ const DestinationsSection = () => {
               {/* Image Container */}
               <div className="relative overflow-hidden h-64">
                 <img 
-                  src={destination.image} 
+                  src={getDestinationImage(destination, index)} 
                   alt={destination.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -273,16 +219,9 @@ const DestinationsSection = () => {
                 
                 {/* Top Badges */}
                 <div className="absolute top-4 left-4 flex gap-2">
-                  {destination.popular && (
-                    <Badge className="bg-secondary text-secondary-foreground">
-                      Mais Popular
-                    </Badge>
-                  )}
-                  {destination.exclusive && (
-                    <Badge className="bg-accent text-accent-foreground">
-                      Exclusivo
-                    </Badge>
-                  )}
+                  <Badge className="bg-primary text-primary-foreground">
+                    Novo
+                  </Badge>
                 </div>
 
                 {/* Favorite Button */}
@@ -306,13 +245,8 @@ const DestinationsSection = () => {
                 <div className="absolute bottom-4 right-4">
                   <div className="bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2">
                     <div className="text-sm font-semibold text-primary">
-                      {destination.price}
+                      R$ {destination.price.toFixed(2)}
                     </div>
-                    {destination.originalPrice && (
-                      <div className="text-xs text-muted-foreground line-through">
-                        {destination.originalPrice}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -323,14 +257,11 @@ const DestinationsSection = () => {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center text-muted-foreground">
                     <MapPin className="h-4 w-4 mr-1" />
-                    <span className="text-sm">{destination.state}</span>
+                    <span className="text-sm">{destination.location}</span>
                   </div>
                   <div className="flex items-center">
                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-                    <span className="text-sm font-medium">{destination.rating}</span>
-                    <span className="text-sm text-muted-foreground ml-1">
-                      ({destination.reviewCount})
-                    </span>
+                    <span className="text-sm font-medium">Novo</span>
                   </div>
                 </div>
 
@@ -342,11 +273,11 @@ const DestinationsSection = () => {
                 {/* Category & Duration */}
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm text-accent font-medium">
-                    {destination.category}
+                    Destino Turístico
                   </span>
                   <div className="flex items-center text-muted-foreground">
                     <Clock className="h-4 w-4 mr-1" />
-                    <span className="text-sm">{destination.duration}</span>
+                    <span className="text-sm">{destination.duration} dias</span>
                   </div>
                 </div>
 

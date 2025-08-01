@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Menu, X, Plane, Heart, User } from 'lucide-react';
+import { MapPin, Menu, X, Plane, Heart, User, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -84,6 +85,12 @@ const Header = () => {
               <User className="h-4 w-4 mr-2" />
               Entrar
             </Button>
+            <Link to="/registrar-destino">
+              <Button variant="outline" size="sm" className="hover-glow">
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Destino
+              </Button>
+            </Link>
             <Button className="btn-hero">
               <Plane className="h-4 w-4 mr-2" />
               Planejar Viagem
@@ -149,6 +156,12 @@ const Header = () => {
                   <User className="h-4 w-4 mr-2" />
                   Entrar
                 </Button>
+                <Link to="/registrar-destino">
+                  <Button variant="outline" size="sm" className="justify-start w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Adicionar Destino
+                  </Button>
+                </Link>
                 <Button className="btn-hero justify-start">
                   <Plane className="h-4 w-4 mr-2" />
                   Planejar Viagem
