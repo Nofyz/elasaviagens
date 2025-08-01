@@ -25,6 +25,7 @@ const destinationSchema = z.object({
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
   location: z.string().min(2, "Localização é obrigatória"),
   price: z.string().min(1, "Preço é obrigatório"),
+  originalPrice: z.string().optional(),
   duration: z.string().min(1, "Duração é obrigatória"),
   highlights: z.string().min(10, "Destaques devem ter pelo menos 10 caracteres"),
   minPeople: z.string().min(1, "Número mínimo de pessoas é obrigatório"),
@@ -49,6 +50,7 @@ export default function RegisterDestination() {
       description: "",
       location: "",
       price: "",
+      originalPrice: "",
       duration: "",
       highlights: "",
       minPeople: "",
@@ -116,6 +118,7 @@ export default function RegisterDestination() {
         location: data.location,
         description: data.description,
         price: parseFloat(data.price.replace(/[^\d.,]/g, '').replace(',', '.')) || 0,
+        original_price: data.originalPrice ? parseFloat(data.originalPrice.replace(/[^\d.,]/g, '').replace(',', '.')) : null,
         duration: parseInt(data.duration.replace(/\D/g, '')) || 1,
         highlights: highlightsArray,
         min_people: parseInt(data.minPeople.replace(/\D/g, '')) || 1,
@@ -218,17 +221,34 @@ export default function RegisterDestination() {
                     )}
                   />
 
-                  {/* Preço e Duração */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Preço, Preço Original e Duração */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="price"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Preço</FormLabel>
+                          <FormLabel>Preço Atual</FormLabel>
                           <FormControl>
                             <Input placeholder="Ex: R$ 1.200" {...field} />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="originalPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Preço Original (opcional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ex: R$ 1.500" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Preço antes do desconto (será mostrado riscado)
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

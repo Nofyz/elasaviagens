@@ -35,6 +35,7 @@ interface Destination {
   location: string;
   description: string;
   price: number;
+  original_price: number | null;
   duration: number;
   min_people: number;
   max_people: number;
@@ -164,6 +165,7 @@ const PackagesSection = () => {
             location: dest.location,
             description: dest.description,
             price: dest.price,
+            original_price: dest.original_price,
             duration: dest.duration,
             min_people: dest.min_people,
             max_people: dest.max_people,
@@ -338,9 +340,13 @@ const PackagesSection = () => {
                           <div className="text-lg font-bold text-primary">
                             {item.type === 'package' ? item.price : `R$ ${item.price.toFixed(2)}`}
                           </div>
-                          {item.type === 'package' && item.originalPrice && (
+                          {((item.type === 'package' && item.originalPrice) || 
+                            (item.type === 'destination' && item.original_price)) && (
                             <div className="text-sm text-muted-foreground line-through -mt-1">
-                              {item.originalPrice}
+                              {item.type === 'package' 
+                                ? item.originalPrice 
+                                : `R$ ${item.original_price?.toFixed(2)}`
+                              }
                             </div>
                           )}
                           <div className="text-xs text-muted-foreground">
