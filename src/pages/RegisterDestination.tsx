@@ -62,6 +62,7 @@ export default function RegisterDestination() {
   };
 
   const onSubmit = async (data: DestinationForm) => {
+    console.log('🚀 FORM SUBMISSION STARTED');
     console.log('Form submitted with data:', data);
     setIsSubmitting(true);
     
