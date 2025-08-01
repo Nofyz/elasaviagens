@@ -351,7 +351,7 @@ const PackagesSection = () => {
                     </div>
 
                     {/* Card Content */}
-                    <div className="p-6">
+                    <div className="p-6 flex flex-col h-full">
                       {/* Title & Location */}
                       <h3 className="font-montserrat font-bold text-xl mb-2 group-hover:text-primary transition-colors duration-300">
                         {item.type === 'package' ? item.title : item.name}
@@ -422,13 +422,13 @@ const PackagesSection = () => {
                       </div>
 
                       {/* CTA Buttons */}
-                      <div className="space-y-2">
+                      <div className="space-y-2 mt-auto">
                         <Button className="w-full">
                           <Plane className="h-4 w-4 mr-2" />
                           Ver Detalhes
                         </Button>
                         <Button variant="outline" className="w-full text-sm">
-                          {item.type === 'package' ? 'Solicitar Orçamento' : 'Favoritar'}
+                          Solicitar Orçamento
                         </Button>
                       </div>
                     </div>
