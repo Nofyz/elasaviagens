@@ -100,8 +100,8 @@ export default function RegisterDestination() {
         name: data.name,
         location: data.location,
         description: data.description,
-        price: parseFloat(data.price.replace(/[^\d.,]/g, '').replace(',', '.')),
-        duration: parseInt(data.duration.replace(/\D/g, '')),
+        price: parseFloat(data.price.replace(/[^\d.,]/g, '').replace(',', '.')) || 0,
+        duration: parseInt(data.duration.replace(/\D/g, '')) || 1,
         highlights: highlightsArray,
         image_url: imageUrl
       };
