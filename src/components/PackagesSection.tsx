@@ -3,6 +3,7 @@ import { Star, Calendar, Users, MapPin, Plane, ChevronLeft, ChevronRight, Heart,
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 
 // Import destination images
 import fernadoNoronhaImg from '@/assets/hero-fernando-noronha.jpg';
@@ -35,6 +36,11 @@ interface Destination {
   description: string;
   price: number;
   duration: number;
+  min_people: number;
+  max_people: number;
+  rating: number;
+  review_count: number;
+  included_items: string[];
   highlights: string[];
   image_url: string | null;
   created_at: string;
@@ -152,8 +158,22 @@ const PackagesSection = () => {
         if (error) {
           console.error('Error fetching destinations:', error);
         } else {
-          const destinationsWithType: Destination[] = (data || []).map(dest => ({
-            ...dest,
+          const destinationsWithType: Destination[] = (data || []).map((dest: any) => ({
+            id: dest.id,
+            name: dest.name,
+            location: dest.location,
+            description: dest.description,
+            price: dest.price,
+            duration: dest.duration,
+            min_people: dest.min_people,
+            max_people: dest.max_people,
+            rating: Number(dest.rating),
+            review_count: dest.review_count,
+            included_items: dest.included_items,
+            highlights: dest.highlights,
+            image_url: dest.image_url,
+            created_at: dest.created_at,
+            updated_at: dest.updated_at,
             type: 'destination' as const
           }));
           
@@ -357,42 +377,39 @@ const PackagesSection = () => {
                             </>
                           )}
                         </div>
-                        {item.type === 'package' && (
-                          <div className="flex items-center">
-                            <Users className="h-4 w-4 mr-1" />
-                            <span>{item.groupSize}</span>
-                          </div>
-                        )}
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 mr-1" />
+                          <span>
+                            {item.type === 'package' 
+                              ? item.groupSize 
+                              : `${item.min_people}-${item.max_people} pessoas`
+                            }
+                          </span>
+                        </div>
                       </div>
 
                       {/* Rating */}
                       <div className="flex items-center mb-4">
                         <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-                        {item.type === 'package' ? (
-                          <>
-                            <span className="text-sm font-medium mr-1">{item.rating}</span>
-                            <span className="text-sm text-muted-foreground">
-                              ({item.reviewCount} avaliações)
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-sm font-medium">Novo destino</span>
-                        )}
+                        <span className="text-sm font-medium mr-1">
+                          {item.type === 'package' ? item.rating : item.rating}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          ({item.type === 'package' ? item.reviewCount : item.review_count} avaliações)
+                        </span>
                       </div>
 
                       {/* Includes/Category */}
-                      {item.type === 'package' && (
-                        <div className="mb-4">
-                          <div className="text-sm font-medium text-foreground mb-2">Incluso:</div>
-                          <div className="flex flex-wrap gap-1">
-                            {item.includes.map((include, idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
-                                {include}
-                              </Badge>
-                            ))}
-                          </div>
+                      <div className="mb-4">
+                        <div className="text-sm font-medium text-foreground mb-2">Incluso:</div>
+                        <div className="flex flex-wrap gap-1">
+                          {(item.type === 'package' ? item.includes : item.included_items).map((include, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-xs">
+                              {include}
+                            </Badge>
+                          ))}
                         </div>
-                      )}
+                      </div>
 
                       {/* Highlights */}
                       <div className="space-y-1 mb-6">
