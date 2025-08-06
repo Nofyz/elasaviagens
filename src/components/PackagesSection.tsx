@@ -158,7 +158,7 @@ const PackagesSection = () => {
             Destinos Exclusivos
           </div>
           <h2 className="font-montserrat font-bold text-4xl md:text-5xl mb-6 text-gradient-ocean">
-            Experiências Curadas para Você
+            As Melhores Experiências para Você
           </h2>
           <p className="font-inter text-lg text-muted-foreground max-w-2xl mx-auto">
             Destinos únicos com roteiros personalizados, hospedagem premium 

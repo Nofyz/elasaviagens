@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useFavorites } from '@/hooks/useFavorites';
+// import { useFavorites } from '@/hooks/useFavorites'; // Temporarily hidden
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -13,12 +13,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { 
-  MapPin, Star, Users, Clock, Heart, Plane, Filter, 
+  MapPin, Star, Users, Clock, Plane, Filter, 
   Search, SlidersHorizontal, X 
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
 
 // Fallback images
 const fallbackImages = [
@@ -61,7 +60,7 @@ interface FilterState {
 
 const Shop = () => {
   const [showFilters, setShowFilters] = useState(true);
-  const { favorites, toggleFavorite, isFavorite, isToggling } = useFavorites();
+  // const { favorites, toggleFavorite, isFavorite, isToggling } = useFavorites(); // Temporarily hidden
   const location = useLocation();
   
   const [filters, setFilters] = useState<FilterState>({
@@ -81,11 +80,7 @@ const Shop = () => {
     const params = new URLSearchParams(location.search);
     const filterParam = params.get('filter');
     
-    console.log('URL location:', location.pathname + location.search);
-    console.log('Filter param:', filterParam);
-    
     if (filterParam === 'favoritos') {
-      console.log('Ativando filtro de favoritos');
       setFilters(prev => ({ ...prev, onlyFavorites: true }));
     } else {
       // Reset favorites filter if not in URL
@@ -172,10 +167,10 @@ const Shop = () => {
         if (!hasInclude) return false;
       }
 
-      // Favorites filter
-      if (filters.onlyFavorites && !isFavorite(dest.id)) {
-        return false;
-      }
+      // Favorites filter - Temporarily hidden
+      // if (filters.onlyFavorites && !isFavorite(dest.id)) {
+      //   return false;
+      // }
 
       return true;
     });
@@ -183,25 +178,23 @@ const Shop = () => {
     // Sort destinations
     switch (filters.sortBy) {
       case 'price-low':
-        filtered.sort((a: Destination, b: Destination) => a.price - b.price);
+        filtered.sort((a, b) => a.price - b.price);
         break;
       case 'price-high':
-        filtered.sort((a: Destination, b: Destination) => b.price - a.price);
+        filtered.sort((a, b) => b.price - a.price);
         break;
       case 'rating':
-        filtered.sort((a: Destination, b: Destination) => b.rating - a.rating);
+        filtered.sort((a, b) => b.rating - a.rating);
         break;
       case 'duration':
-        filtered.sort((a: Destination, b: Destination) => a.duration - b.duration);
+        filtered.sort((a, b) => a.duration - b.duration);
         break;
       default:
-        filtered.sort((a: Destination, b: Destination) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     return filtered;
   }, [destinations, filters]);
-
-
 
   const clearFilters = () => {
     setFilters({
@@ -362,9 +355,9 @@ const Shop = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Qualquer tamanho</SelectItem>
-                        <SelectItem value="2">Casal (2 pessoas)</SelectItem>
-                        <SelectItem value="4">Família (até 4 pessoas)</SelectItem>
-                        <SelectItem value="8">Grupo (8+ pessoas)</SelectItem>
+                        <SelectItem value="2">Até 2 pessoas</SelectItem>
+                        <SelectItem value="4">3-4 pessoas</SelectItem>
+                        <SelectItem value="8">5+ pessoas</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -373,51 +366,26 @@ const Shop = () => {
 
                   {/* Rating */}
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Avaliação Mínima</Label>
-                    <div className="flex items-center space-x-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => {
-                            const newRating = filters.rating === star.toString() ? 'all' : star.toString();
-                            setFilters(prev => ({ ...prev, rating: newRating }));
-                          }}
-                          className={`p-1 transition-all duration-200 hover:scale-110 ${
-                            parseInt(filters.rating) >= star && filters.rating !== 'all'
-                              ? 'text-blue-500 hover:text-blue-600'
-                              : 'text-gray-300 hover:text-blue-400'
-                          }`}
-                        >
-                          <Star 
-                            className={`h-5 w-5 ${
-                              parseInt(filters.rating) >= star && filters.rating !== 'all'
-                                ? 'fill-current' 
-                                : ''
-                            }`} 
-                          />
-                        </button>
-                      ))}
-                      {filters.rating !== 'all' && (
-                        <button
-                          onClick={() => setFilters(prev => ({ ...prev, rating: 'all' }))}
-                          className="ml-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      )}
-                    </div>
-                    {filters.rating !== 'all' && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {filters.rating}+ estrelas ou mais
-                      </p>
-                    )}
+                    <Label className="text-sm font-medium mb-2 block">Avaliação</Label>
+                    <Select
+                      value={filters.rating}
+                      onValueChange={(value) => setFilters(prev => ({ ...prev, rating: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Qualquer avaliação" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Qualquer avaliação</SelectItem>
+                        <SelectItem value="4">4+ estrelas</SelectItem>
+                        <SelectItem value="4.5">4.5+ estrelas</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <Separator />
 
-                  {/* Favorites Filter */}
-                  <div>
+                  {/* Favorites Filter - Temporarily hidden */}
+                  {/* <div>
                     <Label className="text-sm font-medium mb-3 block">Filtros Especiais</Label>
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
@@ -429,12 +397,11 @@ const Shop = () => {
                           }}
                         />
                         <Label htmlFor="only-favorites" className="text-sm cursor-pointer flex items-center">
-                          <Heart className="h-4 w-4 mr-1 text-red-500" />
-                          Apenas Favoritos ({favorites.length})
+                          Apenas Favoritos (0)
                         </Label>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <Separator />
 
@@ -510,8 +477,6 @@ const Shop = () => {
                     <SelectItem value="duration">Duração</SelectItem>
                   </SelectContent>
                 </Select>
-
-
               </div>
             </div>
 
@@ -528,33 +493,39 @@ const Shop = () => {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredDestinations.map((destination: Destination, index: number) => (
-                  <Card 
-                    key={destination.id} 
-                    className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1"
-                  >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredDestinations.map((destination, index) => (
+                  <Card key={destination.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white">
                     {/* Image */}
-                    <div className="relative overflow-hidden h-56">
+                    <div className="relative h-48 overflow-hidden rounded-t-xl">
                       <img
                         src={getDestinationImage(destination, index)}
                         alt={destination.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                       
-                      {/* Favorite Button */}
-                      <button
-                        onClick={() => toggleFavorite(destination.id)}
-                        className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 transition-all duration-300 hover:scale-110"
+                      {/* Favorite Button - Temporarily hidden */}
+                      {/* <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleFavorite(destination.id);
+                        }}
+                        disabled={isToggling}
+                        className={`absolute top-4 right-4 backdrop-blur-sm rounded-full p-2 transition-all duration-300 hover:scale-110 ${
+                          isFavorite(destination.id)
+                            ? 'bg-red-500/20 hover:bg-red-500/30'
+                            : 'bg-white/20 hover:bg-white/30'
+                        }`}
                       >
                         <Heart 
                           className={`h-5 w-5 transition-colors duration-300 ${
                             isFavorite(destination.id) 
                               ? 'text-red-500 fill-red-500' 
                               : 'text-white'
-                          }`} 
+                          } ${isToggling ? 'animate-pulse' : ''}`} 
                         />
-                      </button>
+                      </button> */}
 
                       {/* Price */}
                       <div className="absolute bottom-4 right-4">

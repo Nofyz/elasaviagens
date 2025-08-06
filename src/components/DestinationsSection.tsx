@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Star, Clock, Heart, ChevronRight, ChevronLeft } from 'lucide-react';
+import { MapPin, Star, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDestinations } from '@/hooks/use-supabase';
@@ -11,7 +11,7 @@ type Destination = Database['public']['Tables']['destinations']['Row'];
 
 const DestinationsSection = () => {
   const navigate = useNavigate();
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  // const [favorites, setFavorites] = useState<Set<string>>(new Set()); // Temporarily hidden
   const [currentGroup, setCurrentGroup] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   
@@ -28,15 +28,15 @@ const DestinationsSection = () => {
     fetchDestinations();
   }, [fetchDestinations]);
 
-  const toggleFavorite = (destinationId: string) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(destinationId)) {
-      newFavorites.delete(destinationId);
-    } else {
-      newFavorites.add(destinationId);
-    }
-    setFavorites(newFavorites);
-  };
+  // const toggleFavorite = (destinationId: string) => {
+  //   const newFavorites = new Set(favorites);
+  //   if (newFavorites.has(destinationId)) {
+  //     newFavorites.delete(destinationId);
+  //   } else {
+  //     newFavorites.add(destinationId);
+  //   }
+  //   setFavorites(newFavorites);
+  // };
 
   const handleDestinationClick = (destination: Destination) => {
     navigate(`/destino/${destination.id}`);
@@ -208,8 +208,8 @@ const DestinationsSection = () => {
                   </Badge>
                 </div>
 
-                {/* Favorite Button */}
-                <button 
+                {/* Favorite Button - Temporarily hidden */}
+                {/* <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(destination.id);
@@ -223,7 +223,7 @@ const DestinationsSection = () => {
                         : 'text-white'
                     }`} 
                   />
-                </button>
+                </button> */}
 
                 {/* Price Badge */}
                 <div className="absolute bottom-4 right-4">

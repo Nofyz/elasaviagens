@@ -1,41 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  Heart, 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { 
+  Menu, 
+  X, 
   User, 
   LogIn, 
+  LogOut, 
   UserPlus, 
   Settings, 
-  HelpCircle, 
-  LogOut,
-  Menu,
-  X
+  HelpCircle 
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import logoElasa from '/logo-elasa.png';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // This would come from auth context
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navigationLinks = [
     { href: '/', label: 'Início' },
@@ -45,32 +33,39 @@ const Header = () => {
     { href: '/sobre#contato', label: 'Contato' }
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-border' 
-          : 'bg-white/90 backdrop-blur-sm'
-      }`}
-    >
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-border' 
+        : 'bg-white/80 backdrop-blur-sm'
+    }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - Left */}
-          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
             <img 
-              src={logoElasa} 
-              alt="Elasa Viagens e Turismo" 
-              className="h-12 w-auto"
+              src="/logo-elasa.png" 
+              alt="Elasa Viagens" 
+              className="h-8 w-auto"
             />
           </Link>
 
-          {/* Desktop Navigation - Center */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
             {navigationLinks.map((link, index) => (
-              <Link 
+              <Link
                 key={index}
                 to={link.href}
-                className="px-3 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
+                className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-all duration-200"
               >
                 {link.label}
               </Link>
@@ -79,59 +74,29 @@ const Header = () => {
 
           {/* Desktop Actions - Right */}
           <div className="hidden lg:flex items-center space-x-3">
-            {/* Favorites */}
-            <Link to="/loja?filter=favoritos">
-              <Button variant="ghost" size="sm" className="hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 relative">
-                <Heart className="h-4 w-4" />
-              </Button>
-            </Link>
-
             {/* Profile Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="hover:bg-blue-50 hover:text-blue-600 transition-all duration-200">
+                <Button variant="ghost" size="sm" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
                   {isLoggedIn ? (
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="" alt="Profile" />
-                      <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                        U
-                      </AvatarFallback>
+                      <AvatarImage src="/avatar.png" />
+                      <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                   ) : (
-                    <User className="h-4 w-4" />
+                    <>
+                      <User className="h-4 w-4 mr-2" />
+                      Conta
+                    </>
                   )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {!isLoggedIn ? (
+                {isLoggedIn ? (
                   <>
-                    <DropdownMenuLabel>Bem-vindo!</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer">
-                      <LogIn className="mr-2 h-4 w-4" />
-                      <span>Entrar</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      <span>Registrar</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer">
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      <span>Ajuda</span>
-                    </DropdownMenuItem>
-                  </>
-                ) : (
-                  <>
-                    <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>Perfil</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Heart className="mr-2 h-4 w-4" />
-                      <span>Favoritos</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
@@ -148,6 +113,20 @@ const Header = () => {
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sair</span>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem 
+                      className="cursor-pointer"
+                      onClick={() => setIsLoggedIn(true)}
+                    >
+                      <LogIn className="mr-2 h-4 w-4" />
+                      <span>Entrar</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      <span>Registrar</span>
                     </DropdownMenuItem>
                   </>
                 )}
@@ -174,55 +153,46 @@ const Header = () => {
                 <Link
                   key={index}
                   to={link.href}
-                  className="block px-4 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
+                  className="block px-4 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
               
-              <div className="px-4 pt-4 border-t border-border space-y-2">
-                <Link to="/loja?filter=favoritos" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200">
-                    <Heart className="h-4 w-4 mr-2" />
-                    Favoritos
+              {!isLoggedIn ? (
+                <>
+                  <Button 
+                    className="w-full justify-start bg-gradient-to-r from-primary to-secondary text-white hover:from-primary/90 hover:to-secondary/90 transition-all duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Entrar
                   </Button>
-                </Link>
-                
-                {!isLoggedIn ? (
-                  <>
-                    <Button 
-                      className="w-full justify-start bg-gradient-to-r from-blue-500 to-teal-600 text-white hover:from-blue-600 hover:to-teal-700 transition-all duration-200"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <LogIn className="h-4 w-4 mr-2" />
-                      Entrar
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Registrar
-                    </Button>
-                  </>
-                ) : (
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all duration-200"
-                    onClick={() => {
-                      setIsLoggedIn(false);
-                      setIsMobileMenuOpen(false);
-                    }}
+                    className="w-full justify-start hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sair
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Registrar
                   </Button>
-                )}
-              </div>
+                </>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all duration-200"
+                  onClick={() => {
+                    setIsLoggedIn(false);
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
+                </Button>
+              )}
             </nav>
           </div>
         )}

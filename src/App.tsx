@@ -22,16 +22,18 @@ import EditDestination from "./pages/EditDestination";
 import TestDelete from "./components/TestDelete";
 import PermissionTest from "./components/PermissionTest";
 import RLSFix from "./components/RLSFix";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/loja" element={<Shop />} />
           <Route path="/sobre" element={<About />} />
@@ -59,6 +61,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+    </ErrorBoundary>
 );
 
 export default App;

@@ -7,23 +7,29 @@ export const useFavorites = () => {
   // Load favorites from localStorage on mount
   useEffect(() => {
     const savedFavorites = localStorage.getItem('favorites');
+    
     if (savedFavorites) {
       try {
         const favoritesArray = JSON.parse(savedFavorites);
         setFavorites(new Set(favoritesArray));
       } catch (error) {
         console.error('Error loading favorites:', error);
+        // Clear corrupted data
+        localStorage.removeItem('favorites');
+        setFavorites(new Set());
       }
     }
   }, []);
 
   // Save favorites to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(Array.from(favorites)));
+    const favoritesArray = Array.from(favorites);
+    localStorage.setItem('favorites', JSON.stringify(favoritesArray));
   }, [favorites]);
 
   const toggleFavorite = async (destinationId: string) => {
     setIsToggling(true);
+    
     try {
       setFavorites(prev => {
         const newFavorites = new Set(prev);
@@ -34,6 +40,8 @@ export const useFavorites = () => {
         }
         return newFavorites;
       });
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     } finally {
       setIsToggling(false);
     }
@@ -43,10 +51,15 @@ export const useFavorites = () => {
     return favorites.has(destinationId);
   };
 
+  const clearFavorites = () => {
+    setFavorites(new Set());
+  };
+
   return {
     favorites: Array.from(favorites),
     toggleFavorite,
     isFavorite,
-    isToggling
+    isToggling,
+    clearFavorites
   };
 }; 

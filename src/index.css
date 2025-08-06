@@ -17,13 +17,13 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 200 100% 37%;
+    --primary: 234 50% 36%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 13 100% 64%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 45 100% 50%;
+    --secondary-foreground: 222.2 84% 4.9%;
 
-    --accent: 51 100% 50%;
+    --accent: 45 100% 50%;
     --accent-foreground: 222.2 84% 4.9%;
 
     --muted: 200 20% 97%;
@@ -34,17 +34,17 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 200 100% 37%;
+    --ring: 234 50% 36%;
     
     /* Travel agency specific colors */
-    --ocean-blue: 200 100% 37%;
-    --coral: 13 100% 64%;
-    --sunset-gold: 51 100% 50%;
+    --ocean-blue: 234 50% 36%;
+    --coral: 45 100% 50%;
+    --sunset-gold: 45 100% 50%;
     --beach-sand: 45 29% 94%;
     
     /* Gradients */
     --gradient-ocean: linear-gradient(135deg, hsl(var(--ocean-blue)), hsl(var(--coral)));
-    --gradient-sunset: linear-gradient(135deg, hsl(var(--sunset-gold)), hsl(var(--coral)));
+    --gradient-sunset: linear-gradient(135deg, hsl(var(--sunset-gold)), hsl(var(--ocean-blue)));
     --gradient-paradise: linear-gradient(135deg, hsl(var(--ocean-blue)), hsl(var(--accent)), hsl(var(--coral)));
     
     /* Shadows */

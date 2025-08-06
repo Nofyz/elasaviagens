@@ -6,31 +6,45 @@ import heroImage from '@/assets/hero-fernando-noronha.jpg';
 import heroJericoacoaraDunes from '@/assets/hero-jericoacoara-dunes.jpg';
 import heroSalvadorPelourinho from '@/assets/hero-salvador-pelourinho.jpg';
 import heroNatalBeach from '@/assets/hero-natal-beach.jpg';
+import heroFernandoNoronha from '/fernando-noronha.png';
+import heroLencoisMaranhenses from '/lencois-maranhenses.png';
+import heroPraiaDeCarneiros from '/praia-de-carneiros.jpg';
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Texto fixo global para todos os slides
+  const heroContent = {
+    title: "Descubra as Maravilhas do Nordeste",
+    subtitle: "Destinos Únicos e Paisagens Inesquecíveis",
+    description: "Do litoral paradisíaco ao sertão encantador, explore as belezas naturais, a rica cultura e a hospitalidade única do Nordeste brasileiro. Cada destino é uma experiência transformadora que vai marcar sua vida para sempre.",
+    highlight: "Experiências Únicas e Inesquecíveis"
+  };
+
   const heroSlides = [
     {
+      image: heroFernandoNoronha,
+      alt: "Fernando de Noronha - Morro Dois Irmãos e praia paradisíaca"
+    },
+    {
+      image: heroLencoisMaranhenses,
+      alt: "Lençóis Maranhenses - Dunas brancas e lagoas de água doce"
+    },
+    {
+      image: heroPraiaDeCarneiros,
+      alt: "Praia de Carneiros - Igreja na praia e coqueirais"
+    },
+    {
       image: heroImage,
-      title: "Descubra o Paraíso Nordestino",
-      subtitle: "Fernando de Noronha",
-      description: "Águas cristalinas, vida marinha exuberante e paisagens de tirar o fôlego te aguardam no arquipélago mais famoso do Brasil.",
-      highlight: "A partir de R$ 2.890"
+      alt: "Fernando de Noronha - Praias paradisíacas e águas cristalinas"
     },
     {
       image: heroJericoacoaraDunes,
-      title: "Aventura nas Dunas e Lagoas",
-      subtitle: "Jericoacoara - Ceará",
-      description: "Entre dunas douradas e lagoas de águas azul-turquesa, viva experiências únicas no coração do sertão cearense.",
-      highlight: "Pacotes a partir de R$ 1.890"
+      alt: "Jericoacoara - Dunas douradas e lagoas azul-turquesa"
     },
     {
       image: heroSalvadorPelourinho,
-      title: "História e Cultura Afro-Brasileira",
-      subtitle: "Salvador - Bahia",
-      description: "Mergulhe na rica herança cultural baiana, entre casarões coloniais, música e gastronomia que encantam o mundo.",
-      highlight: "Roteiros culturais únicos"
+      alt: "Salvador - História, cultura e arquitetura colonial"
     }
   ];
 
@@ -63,7 +77,7 @@ const HeroSection = () => {
           >
             <img 
               src={slide.image} 
-              alt={slide.subtitle}
+              alt={slide.alt}
               className="w-full h-full object-cover scale-105 transition-transform duration-[8000ms] ease-out"
               style={{
                 transform: index === currentSlide ? 'scale(1.02)' : 'scale(1.05)'
@@ -82,19 +96,19 @@ const HeroSection = () => {
             {/* Animated Content */}
             <div key={currentSlide} className="animate-fade-in-up">
               <h1 className="font-montserrat font-bold text-4xl md:text-6xl lg:text-7xl mb-4 leading-tight">
-                {heroSlides[currentSlide].title}
+                {heroContent.title}
               </h1>
               
               <div className="font-dancing text-2xl md:text-3xl text-accent mb-6">
-                {heroSlides[currentSlide].subtitle}
+                {heroContent.subtitle}
               </div>
               
               <p className="font-inter text-lg md:text-xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
-                {heroSlides[currentSlide].description}
+                {heroContent.description}
               </p>
               
               <div className="font-inter font-semibold text-xl md:text-2xl text-accent mb-10">
-                {heroSlides[currentSlide].highlight}
+                {heroContent.highlight}
               </div>
             </div>
 
