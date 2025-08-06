@@ -16,39 +16,150 @@ export type Database = {
     Tables: {
       destinations: {
         Row: {
-          created_at: string
+          id: string
+          name: string
+          location: string
           description: string
+          price: number
           duration: number
           highlights: string[]
-          id: string
           image_url: string | null
-          location: string
+          created_at: string
+          updated_at: string
+          min_people: number
+          max_people: number
+          rating: number
+          review_count: number
+          included_items: string[]
+          original_price: number
+        }
+        Insert: {
+          id?: string
           name: string
+          location: string
+          description: string
           price: number
+          duration: number
+          highlights?: string[]
+          image_url?: string | null
+          created_at?: string
+          updated_at?: string
+          min_people?: number
+          max_people?: number
+          rating?: number
+          review_count?: number
+          included_items?: string[]
+          original_price?: number
+        }
+        Update: {
+          id?: string
+          name?: string
+          location?: string
+          description?: string
+          price?: number
+          duration?: number
+          highlights?: string[]
+          image_url?: string | null
+          created_at?: string
+          updated_at?: string
+          min_people?: number
+          max_people?: number
+          rating?: number
+          review_count?: number
+          included_items?: string[]
+          original_price?: number
+        }
+        Relationships: []
+      }
+      admins: {
+        Row: {
+          id: number
+          username: string
+          email: string
+          password: string
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          username: string
+          email: string
+          password: string
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          username?: string
+          email?: string
+          password?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          id: string
+          user_id: number
+          destination_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: number
+          destination_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: number
+          destination_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      users: {
+        Row: {
+          id: number
+          username: string
+          email: string
+          password: string
+          first_name: string
+          last_name: string
+          created_at: string
           updated_at: string
         }
         Insert: {
+          id?: number
+          username: string
+          email: string
+          password: string
+          first_name: string
+          last_name: string
           created_at?: string
-          description: string
-          duration: number
-          highlights?: string[]
-          id?: string
-          image_url?: string | null
-          location: string
-          name: string
-          price: number
           updated_at?: string
         }
         Update: {
+          id?: number
+          username?: string
+          email?: string
+          password?: string
+          first_name?: string
+          last_name?: string
           created_at?: string
-          description?: string
-          duration?: number
-          highlights?: string[]
-          id?: string
-          image_url?: string | null
-          location?: string
-          name?: string
-          price?: number
           updated_at?: string
         }
         Relationships: []

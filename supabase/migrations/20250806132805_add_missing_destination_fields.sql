@@ -1,0 +1,8 @@
+-- Add missing fields to destinations table
+ALTER TABLE public.destinations 
+ADD COLUMN IF NOT EXISTS included_items TEXT[] DEFAULT '{}',
+ADD COLUMN IF NOT EXISTS min_people INTEGER DEFAULT 1,
+ADD COLUMN IF NOT EXISTS max_people INTEGER DEFAULT 10,
+ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT 0.0,
+ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS original_price DECIMAL(10,2);

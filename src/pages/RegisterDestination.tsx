@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,8 @@ export default function RegisterDestination() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
+  const location = useLocation();
+  const isFromAdmin = location.state?.fromAdmin || false;
 
   const form = useForm<DestinationForm>({
     resolver: zodResolver(destinationSchema),
@@ -150,6 +152,13 @@ export default function RegisterDestination() {
       
       form.reset();
       setImagePreview(null);
+      
+      // Se veio do admin, redirecionar de volta
+      if (isFromAdmin) {
+        setTimeout(() => {
+          window.location.href = '/admin/dashboard';
+        }, 1500);
+      }
     } catch (error) {
       console.error('Erro ao registrar destino:', error);
       toast({
@@ -169,11 +178,11 @@ export default function RegisterDestination() {
           {/* Header */}
           <div className="mb-8">
             <Link 
-              to="/" 
+              to={isFromAdmin ? "/admin/dashboard" : "/"} 
               className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors mb-4"
             >
               <ArrowLeft className="h-4 w-4" />
-              Voltar ao início
+              {isFromAdmin ? "Voltar ao Dashboard" : "Voltar ao início"}
             </Link>
             <h1 className="text-3xl font-bold text-foreground mb-2">
               Registrar Novo Destino

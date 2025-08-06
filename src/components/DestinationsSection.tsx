@@ -1,74 +1,32 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Star, Clock, Heart, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { useDestinations } from '@/hooks/use-supabase';
 
-// Import destination images
-import jericoacoaraImg from '@/assets/destination-jericoacoara.jpg';
-import salvadorImg from '@/assets/destination-salvador.jpg';
-import portoGalinhasImg from '@/assets/destination-porto-galinhas.jpg';
-import natalImg from '@/assets/destination-natal.jpg';
-import maragogiImg from '@/assets/destination-maragogi.jpg';
-import fernadoNoronhaImg from '@/assets/hero-fernando-noronha.jpg';
-import canoaQuebradaImg from '@/assets/destination-canoa-quebrada.jpg';
-import praiaDoForteImg from '@/assets/destination-praia-do-forte.jpg';
-import saoLuisImg from '@/assets/destination-sao-luis.jpg';
+import type { Database } from '@/integrations/supabase/types';
 
-interface Destination {
-  id: string;
-  name: string;
-  location: string;
-  description: string;
-  price: number;
-  duration: number;
-  highlights: string[];
-  image_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-// Fallback images for destinations without images
-const fallbackImages = [
-  jericoacoaraImg, salvadorImg, portoGalinhasImg, natalImg, 
-  maragogiImg, fernadoNoronhaImg, canoaQuebradaImg, praiaDoForteImg, saoLuisImg
-];
+type Destination = Database['public']['Tables']['destinations']['Row'];
 
 const DestinationsSection = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [currentGroup, setCurrentGroup] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  const { destinations, loading, error, fetchDestinations } = useDestinations();
   
   const destinationsPerGroup = 3;
-  const totalGroups = Math.ceil(destinations.length / destinationsPerGroup);
+  const validDestinations = destinations.filter(dest => 
+    dest && dest.id && dest.name && dest.location
+  );
+  const totalGroups = Math.ceil(validDestinations.length / destinationsPerGroup);
 
-  // Fetch destinations from Supabase
-  useEffect(() => {
-    const fetchDestinations = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('destinations')
-          .select('*')
-          .order('created_at', { ascending: false });
-          
-        if (error) {
-          console.error('Error fetching destinations:', error);
-        } else {
-          setDestinations(data || []);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  // Fetch destinations on component mount
+  React.useEffect(() => {
     fetchDestinations();
-  }, []);
+  }, [fetchDestinations]);
 
   const toggleFavorite = (destinationId: string) => {
     const newFavorites = new Set(favorites);
@@ -100,11 +58,17 @@ const DestinationsSection = () => {
 
   const getCurrentDestinations = () => {
     const startIndex = currentGroup * destinationsPerGroup;
-    return destinations.slice(startIndex, startIndex + destinationsPerGroup);
+    return validDestinations.slice(startIndex, startIndex + destinationsPerGroup);
   };
 
   const getDestinationImage = (destination: Destination, index: number) => {
-    return destination.image_url || fallbackImages[index % fallbackImages.length];
+    // Se o destino tem uma imagem no banco, usa ela
+    if (destination.image_url) {
+      return destination.image_url;
+    }
+    
+    // Se não tem imagem, usa uma imagem padrão
+    return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop';
   };
 
   if (loading) {
@@ -119,7 +83,27 @@ const DestinationsSection = () => {
     );
   }
 
-  if (destinations.length === 0) {
+  if (error) {
+    return (
+      <section id="destinos" className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="font-montserrat font-bold text-4xl md:text-5xl mb-6 text-gradient-ocean">
+              Erro ao carregar destinos
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              {error}
+            </p>
+            <Button onClick={fetchDestinations} variant="outline">
+              Tentar Novamente
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (validDestinations.length === 0) {
     return (
       <section id="destinos" className="py-20 bg-gradient-to-br from-background via-muted/30 to-background">
         <div className="container mx-auto px-4">

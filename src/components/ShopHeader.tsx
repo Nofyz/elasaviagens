@@ -1,16 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'wouter';
 import { 
-  Heart, 
-  User, 
-  LogIn, 
-  UserPlus, 
-  Settings, 
-  HelpCircle, 
-  LogOut,
-  Menu,
-  X
+  MapPin, Menu, X, User, Heart, Search, ShoppingBag,
+  LogIn, UserPlus, Settings, HelpCircle, LogOut
 } from 'lucide-react';
+import logoImg from '@assets/logo-elasa_1754170413021.png';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,18 +15,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import logoElasa from '/logo-elasa.png';
+import { useFavorites } from '@/hooks/useFavorites';
 
-const Header = () => {
+const ShopHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // This would come from auth context
+  const { favorites, getFavoritesCount } = useFavorites();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -40,9 +35,8 @@ const Header = () => {
   const navigationLinks = [
     { href: '/', label: 'Início' },
     { href: '/loja', label: 'Destinos' },
-    { href: '/#pacotes-personalizados', label: 'Pacotes Personalizados' },
     { href: '/sobre', label: 'Sobre' },
-    { href: '/sobre#contato', label: 'Contato' }
+    { href: '/sobre', label: 'Contato', scrollTo: 'contato' }
   ];
 
   return (
@@ -55,34 +49,56 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - Left */}
+          {/* Logo */}
           <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img 
-              src={logoElasa} 
+              src={logoImg} 
               alt="Elasa Viagens e Turismo" 
-              className="h-12 w-auto"
+              className="h-10 w-auto"
             />
           </Link>
 
-          {/* Desktop Navigation - Center */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
             {navigationLinks.map((link, index) => (
-              <Link 
-                key={index}
-                to={link.href}
-                className="px-3 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
-              >
-                {link.label}
-              </Link>
+              link.scrollTo ? (
+                <button
+                  key={`${link.label}-${index}`}
+                  onClick={() => {
+                    window.location.href = link.href;
+                    setTimeout(() => {
+                      const element = document.getElementById(link.scrollTo);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <Link 
+                  key={`${link.href}-${index}`}
+                  to={link.href}
+                  className="px-3 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
           </nav>
 
-          {/* Desktop Actions - Right */}
+          {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-3">
-            {/* Favorites */}
             <Link to="/loja?filter=favoritos">
               <Button variant="ghost" size="sm" className="hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 relative">
                 <Heart className="h-4 w-4" />
+                {getFavoritesCount() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {getFavoritesCount()}
+                  </span>
+                )}
               </Button>
             </Link>
 
@@ -113,7 +129,7 @@ const Header = () => {
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer">
                       <UserPlus className="mr-2 h-4 w-4" />
-                      <span>Registrar</span>
+                      <span>Criar Conta</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="cursor-pointer">
@@ -133,6 +149,7 @@ const Header = () => {
                       <Heart className="mr-2 h-4 w-4" />
                       <span>Favoritos</span>
                     </DropdownMenuItem>
+
                     <DropdownMenuItem className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Configurações</span>
@@ -171,21 +188,45 @@ const Header = () => {
           <div className="lg:hidden border-t border-border bg-white/95 backdrop-blur-md">
             <nav className="py-4 space-y-1">
               {navigationLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  to={link.href}
-                  className="block px-4 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
+                link.scrollTo ? (
+                  <button
+                    key={`mobile-${link.label}-${index}`}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      window.location.href = link.href;
+                      setTimeout(() => {
+                        const element = document.getElementById(link.scrollTo);
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <Link
+                    key={`mobile-${link.href}-${index}`}
+                    to={link.href}
+                    className="block px-4 py-2 text-sm font-medium text-foreground hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                )
               ))}
               
               <div className="px-4 pt-4 border-t border-border space-y-2">
                 <Link to="/loja?filter=favoritos" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" size="sm" className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200">
+                  <Button variant="outline" size="sm" className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-200 relative">
                     <Heart className="h-4 w-4 mr-2" />
                     Favoritos
+                    {getFavoritesCount() > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {getFavoritesCount()}
+                      </span>
+                    )}
                   </Button>
                 </Link>
                 
@@ -205,7 +246,7 @@ const Header = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <UserPlus className="h-4 w-4 mr-2" />
-                      Registrar
+                      Criar Conta
                     </Button>
                   </>
                 ) : (
@@ -231,4 +272,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default ShopHeader;

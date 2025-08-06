@@ -1,33 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Star, Calendar, Users, MapPin, Plane, ChevronLeft, ChevronRight, Heart, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, Star, Clock, Heart, ChevronRight, ChevronLeft, Users, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
-// Import destination images
-import fernadoNoronhaImg from '@/assets/hero-fernando-noronha.jpg';
+// Import images for fallback
 import jericoacoaraImg from '@/assets/destination-jericoacoara.jpg';
 import salvadorImg from '@/assets/destination-salvador.jpg';
 import portoGalinhasImg from '@/assets/destination-porto-galinhas.jpg';
-
-interface Package {
-  id: string;
-  title: string;
-  destination: string;
-  image: string;
-  duration: string;
-  groupSize: string;
-  price: string;
-  originalPrice?: string;
-  rating: number;
-  reviewCount: number;
-  includes: string[];
-  highlights: string[];
-  tag?: string;
-  saving?: string;
-  type: 'package';
-}
+import fernadoNoronhaImg from '@/assets/hero-fernando-noronha.jpg';
 
 interface Destination {
   id: string;
@@ -49,92 +31,6 @@ interface Destination {
   type: 'destination';
 }
 
-type CombinedItem = Package | Destination;
-
-const packages: Package[] = [
-  {
-    id: 'fernando-noronha-premium',
-    title: 'Fernando de Noronha Premium',
-    destination: 'Fernando de Noronha, PE',
-    image: fernadoNoronhaImg,
-    duration: '7 dias / 6 noites',
-    groupSize: '2-8 pessoas',
-    price: 'R$ 4.890',
-    originalPrice: 'R$ 5.690',
-    rating: 4.9,
-    reviewCount: 89,
-    includes: ['Voos', 'Hotel 5*', 'Mergulho', 'Transfers'],
-    highlights: ['Mergulho com golfinhos', 'Trilhas exclusivas', 'Hotel frente ao mar'],
-    tag: 'Mais Vendido',
-    saving: 'Economize R$ 800',
-    type: 'package'
-  },
-  {
-    id: 'jericoacoara-adventure',
-    title: 'Jericoacoara Aventura',
-    destination: 'Jericoacoara, CE',
-    image: jericoacoaraImg,
-    duration: '5 dias / 4 noites',
-    groupSize: '4-12 pessoas',
-    price: 'R$ 2.390',
-    rating: 4.8,
-    reviewCount: 156,
-    includes: ['Transfer 4x4', 'Pousada', 'Passeios', 'Guia'],
-    highlights: ['Pôr do sol na duna', 'Kitesurf', 'Lagoa Azul', 'Tatajuba'],
-    tag: 'Aventura',
-    type: 'package'
-  },
-  {
-    id: 'salvador-cultural',
-    title: 'Salvador Cultural Experience',
-    destination: 'Salvador, BA',
-    image: salvadorImg,
-    duration: '4 dias / 3 noites',
-    groupSize: '2-15 pessoas',
-    price: 'R$ 1.690',
-    originalPrice: 'R$ 1.890',
-    rating: 4.7,
-    reviewCount: 203,
-    includes: ['Hotel boutique', 'City tour', 'Aulas de capoeira', 'Gastronomia'],
-    highlights: ['Pelourinho histórico', 'Terreiro de Jesus', 'Aula de culinária baiana'],
-    tag: 'Cultural',
-    saving: 'Oferta especial',
-    type: 'package'
-  },
-  {
-    id: 'porto-galinhas-family',
-    title: 'Porto de Galinhas em Família',
-    destination: 'Porto de Galinhas, PE',
-    image: portoGalinhasImg,
-    duration: '6 dias / 5 noites',
-    groupSize: '2-10 pessoas',
-    price: 'R$ 2.890',
-    rating: 4.6,
-    reviewCount: 124,
-    includes: ['Resort All-Inclusive', 'Atividades kids', 'Passeios', 'Mergulho'],
-    highlights: ['Piscinas naturais', 'Atividades para crianças', 'Mergulho iniciante'],
-    tag: 'Família',
-    type: 'package'
-  },
-  {
-    id: 'nordeste-completo',
-    title: 'Nordeste Completo',
-    destination: 'Multi-destinos',
-    image: fernadoNoronhaImg,
-    duration: '12 dias / 11 noites',
-    groupSize: '4-16 pessoas',
-    price: 'R$ 6.890',
-    originalPrice: 'R$ 8.190',
-    rating: 4.9,
-    reviewCount: 67,
-    includes: ['Voos internos', 'Hotéis 4-5*', 'Todos os passeios', 'Guia especializado'],
-    highlights: ['5 destinos incríveis', 'Experiência completa', 'Guia durante toda viagem'],
-    tag: 'Exclusivo',
-    saving: 'Super oferta',
-    type: 'package'
-  }
-];
-
 // Fallback images for destinations without images
 const fallbackImages = [
   jericoacoaraImg, salvadorImg, portoGalinhasImg, fernadoNoronhaImg
@@ -142,12 +38,13 @@ const fallbackImages = [
 
 const PackagesSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [combinedItems, setCombinedItems] = useState<CombinedItem[]>(packages);
+  const [destinations, setDestinations] = useState<Destination[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-  const packagesPerView = 3;
+  const destinationsPerView = 3;
+  const navigate = useNavigate();
 
-  // Fetch destinations from Supabase and combine with packages
+  // Fetch destinations from Supabase
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
@@ -179,8 +76,7 @@ const PackagesSection = () => {
             type: 'destination' as const
           }));
           
-          // Combine packages and destinations
-          setCombinedItems([...packages, ...destinationsWithType]);
+          setDestinations(destinationsWithType);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -208,17 +104,50 @@ const PackagesSection = () => {
 
   const nextSlide = () => {
     setCurrentIndex((prev) => 
-      prev + packagesPerView >= combinedItems.length ? 0 : prev + 1
+      prev + destinationsPerView >= destinations.length ? 0 : prev + 1
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex((prev) => 
-      prev === 0 ? Math.max(0, combinedItems.length - packagesPerView) : prev - 1
+      prev === 0 ? Math.max(0, destinations.length - destinationsPerView) : prev - 1
     );
   };
 
-  const visibleItems = combinedItems.slice(currentIndex, currentIndex + packagesPerView);
+  const handleDestinationClick = (destination: Destination) => {
+    navigate(`/destino/${destination.id}`);
+  };
+
+  const visibleItems = destinations.slice(currentIndex, currentIndex + destinationsPerView);
+
+  if (loading) {
+    return (
+      <section id="pacotes" className="py-20 bg-gradient-to-br from-muted/20 via-background to-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-lg text-muted-foreground">Carregando destinos...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (destinations.length === 0) {
+    return (
+      <section id="pacotes" className="py-20 bg-gradient-to-br from-muted/20 via-background to-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="font-montserrat font-bold text-4xl md:text-5xl mb-6 text-gradient-ocean">
+              Nenhum destino encontrado
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              Seja o primeiro a adicionar um destino incrível!
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="pacotes" className="py-20 bg-gradient-to-br from-muted/20 via-background to-muted/30">
@@ -226,247 +155,198 @@ const PackagesSection = () => {
         {/* Section Header */}
         <div className="text-center mb-16 animate-fade-in-up">
           <div className="inline-block font-dancing text-secondary text-2xl mb-4">
-            Pacotes & Destinos
+            Destinos Exclusivos
           </div>
           <h2 className="font-montserrat font-bold text-4xl md:text-5xl mb-6 text-gradient-ocean">
             Experiências Curadas para Você
           </h2>
           <p className="font-inter text-lg text-muted-foreground max-w-2xl mx-auto">
-            Pacotes completos e destinos únicos com roteiros personalizados, hospedagem premium 
+            Destinos únicos com roteiros personalizados, hospedagem premium 
             e experiências exclusivas que só nossa curadoria pode oferecer.
           </p>
         </div>
 
-        {/* Carousel Container */}
-        <div className="relative">
-          {/* Navigation Buttons */}
-          <button 
-            onClick={prevSlide}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110 hover:shadow-warm"
-            disabled={currentIndex === 0}
-          >
-            <ChevronLeft className="h-6 w-6 text-primary" />
-          </button>
-          
-          <button 
-            onClick={nextSlide}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-50 shadow-lg rounded-full p-3 transition-all duration-300 hover:scale-110 hover:shadow-warm"
-            disabled={currentIndex + packagesPerView >= combinedItems.length}
-          >
-            <ChevronRight className="h-6 w-6 text-primary" />
-          </button>
-
-          {/* Items Grid */}
-          <div className="mx-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {loading ? (
-                // Loading skeleton
-                Array.from({ length: 3 }).map((_, index) => (
-                  <div key={index} className="card-destination animate-pulse">
-                    <div className="h-56 bg-muted rounded-t-lg" />
-                    <div className="p-6 space-y-4">
-                      <div className="h-4 bg-muted rounded w-3/4" />
-                      <div className="h-3 bg-muted rounded w-1/2" />
-                      <div className="h-3 bg-muted rounded w-2/3" />
-                    </div>
-                  </div>
-                ))
-              ) : (
-                visibleItems.map((item, index) => (
-                  <div 
-                    key={item.id}
-                    className="card-destination cursor-pointer animate-scale-in group relative transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    {/* Image Container */}
-                    <div className="relative overflow-hidden h-56">
-                      <img 
-                        src={item.type === 'package' ? item.image : getDestinationImage(item, index)} 
-                        alt={item.type === 'package' ? item.title : item.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      
-                      {/* Tags */}
-                      <div className="absolute top-4 left-4 flex gap-2">
-                        {item.type === 'package' ? (
-                          item.tag && (
-                            <Badge className={`
-                              ${item.tag === 'Mais Vendido' ? 'bg-secondary text-secondary-foreground' : 
-                                item.tag === 'Exclusivo' ? 'bg-accent text-accent-foreground' : 
-                                'bg-primary text-primary-foreground'}
-                            `}>
-                              {item.tag}
-                            </Badge>
-                          )
-                        ) : (
-                          <Badge className="bg-green-500 text-white">
-                            Novo Destino
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* Right corner badges/buttons */}
-                      <div className="absolute top-4 right-4">
-                        {item.type === 'package' ? (
-                          item.saving && (
-                            <Badge className="bg-green-500 text-white">
-                              {item.saving}
-                            </Badge>
-                          )
-                        ) : (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(item.id);
-                            }}
-                            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-2 transition-all duration-300 hover:scale-110"
-                          >
-                            <Heart 
-                              className={`h-5 w-5 transition-colors duration-300 ${
-                                favorites.has(item.id) 
-                                  ? 'text-red-500 fill-red-500' 
-                                  : 'text-white'
-                              }`} 
-                            />
-                          </button>
-                        )}
-                      </div>
-
-                      {/* Price */}
-                      <div className="absolute bottom-4 right-4">
-                        <div className="bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2">
-                          <div className="text-lg font-bold text-primary">
-                            {item.type === 'package' ? item.price : `R$ ${item.price.toFixed(2)}`}
-                          </div>
-                          {((item.type === 'package' && item.originalPrice) || 
-                            (item.type === 'destination' && item.original_price)) && (
-                            <div className="text-sm text-muted-foreground line-through -mt-1">
-                              {item.type === 'package' 
-                                ? item.originalPrice 
-                                : `R$ ${item.original_price?.toFixed(2)}`
-                              }
-                            </div>
-                          )}
-                          <div className="text-xs text-muted-foreground">
-                            por pessoa
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card Content */}
-                    <div className="p-6">
-                      {/* Title & Location */}
-                      <h3 className="font-montserrat font-bold text-xl mb-2 group-hover:text-primary transition-colors duration-300">
-                        {item.type === 'package' ? item.title : item.name}
-                      </h3>
-                      
-                      <div className="flex items-center text-muted-foreground mb-4">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        <span className="text-sm">{item.type === 'package' ? item.destination : item.location}</span>
-                      </div>
-
-                      {/* Details */}
-                      <div className="flex items-center justify-between mb-4 text-sm text-muted-foreground">
-                        <div className="flex items-center">
-                          {item.type === 'package' ? (
-                            <>
-                              <Calendar className="h-4 w-4 mr-1" />
-                              <span>{item.duration}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Clock className="h-4 w-4 mr-1" />
-                              <span>{item.duration} dias</span>
-                            </>
-                          )}
-                        </div>
-                        <div className="flex items-center">
-                          <Users className="h-4 w-4 mr-1" />
-                          <span>
-                            {item.type === 'package' 
-                              ? item.groupSize 
-                              : `${item.min_people}-${item.max_people} pessoas`
-                            }
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Rating */}
-                      <div className="flex items-center mb-4">
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
-                        <span className="text-sm font-medium mr-1">
-                          {item.type === 'package' ? item.rating : item.rating}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          ({item.type === 'package' ? item.reviewCount : item.review_count} avaliações)
-                        </span>
-                      </div>
-
-                      {/* Includes/Category */}
-                      <div className="mb-4">
-                        <div className="text-sm font-medium text-foreground mb-2">Incluso:</div>
-                        <div className="flex flex-wrap gap-1">
-                          {(item.type === 'package' ? item.includes : item.included_items).map((include, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
-                              {include}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Highlights */}
-                      <div className="space-y-1 mb-6">
-                        {item.highlights.slice(0, 3).map((highlight, idx) => (
-                          <div key={idx} className="text-sm text-muted-foreground flex items-center">
-                            <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2 flex-shrink-0" />
-                            {highlight}
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* CTA Buttons */}
-                      <div className="space-y-2">
-                        <Button className="w-full group/btn hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300">
-                          <Plane className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform duration-300" />
-                          Ver Detalhes
-                        </Button>
-                        <Button variant="outline" className="w-full text-sm hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                          {item.type === 'package' ? 'Solicitar Orçamento' : 'Fazer Orçamento'}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
+        {/* Navigation Controls */}
+        {destinations.length > destinationsPerView && (
+          <div className="flex justify-between items-center mb-8">
+            <button
+              onClick={prevSlide}
+              className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
+            >
+              <ChevronLeft className="h-6 w-6 text-primary" />
+            </button>
+            
+            <div className="flex gap-2">
+              {Array.from({ length: Math.ceil(destinations.length / destinationsPerView) }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index * destinationsPerView)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    Math.floor(currentIndex / destinationsPerView) === index
+                      ? 'bg-primary scale-125'
+                      : 'bg-white/30 hover:bg-white/50'
+                  }`}
+                />
+              ))}
             </div>
-          </div>
 
-          {/* Indicators */}
-          <div className="flex justify-center mt-8 space-x-2">
-            {Array.from({ length: Math.ceil(combinedItems.length / packagesPerView) }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index * packagesPerView)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  Math.floor(currentIndex / packagesPerView) === index
-                    ? 'bg-primary scale-125' 
-                    : 'bg-muted hover:bg-primary/50'
-                }`}
-              />
-            ))}
+            <button
+              onClick={nextSlide}
+              className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
+            >
+              <ChevronRight className="h-6 w-6 text-primary" />
+            </button>
           </div>
+        )}
+
+        {/* Destinations Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {visibleItems.map((destination, index) => (
+            <div 
+              key={destination.id}
+              className="card-destination hover-lift cursor-pointer animate-scale-in group"
+              style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => handleDestinationClick(destination)}
+            >
+              {/* Image Container */}
+              <div className="relative overflow-hidden h-64">
+                <img 
+                  src={getDestinationImage(destination, index)} 
+                  alt={destination.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                
+                {/* Overlays and Badges */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                {/* Top Badges */}
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <Badge className="bg-primary text-primary-foreground">
+                    Novo
+                  </Badge>
+                </div>
+
+                {/* Favorite Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(destination.id);
+                  }}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-110"
+                >
+                  <Heart 
+                    className={`h-5 w-5 transition-all duration-300 ${
+                      favorites.has(destination.id) 
+                        ? 'text-red-500 fill-red-500' 
+                        : 'text-white'
+                    }`} 
+                  />
+                </button>
+
+                {/* Price Badge */}
+                <div className="absolute bottom-4 left-4">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2">
+                    <div className="text-lg font-bold text-primary">
+                      R$ {destination.price.toLocaleString('pt-BR')}
+                    </div>
+                    {destination.original_price && (
+                      <div className="text-sm text-muted-foreground line-through">
+                        R$ {destination.original_price.toLocaleString('pt-BR')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6">
+                {/* Location & Rating */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center text-muted-foreground">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{destination.location}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 mr-1" />
+                    <span className="text-sm font-medium">{destination.rating}</span>
+                  </div>
+                </div>
+
+                {/* Destination Name */}
+                <h3 className="font-montserrat font-bold text-xl mb-2 group-hover:text-primary transition-colors duration-300">
+                  {destination.name}
+                </h3>
+
+                {/* Duration & Group Size */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center text-muted-foreground">
+                    <Clock className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{destination.duration} dias</span>
+                  </div>
+                  <div className="flex items-center text-muted-foreground">
+                    <Users className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{destination.min_people}-{destination.max_people} pessoas</span>
+                  </div>
+                </div>
+
+                {/* Included Items */}
+                {destination.included_items && destination.included_items.length > 0 && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-foreground mb-2">Incluso:</div>
+                    <div className="flex flex-wrap gap-1">
+                      {destination.included_items.slice(0, 4).map((include, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {include}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Highlights */}
+                <div className="space-y-1 mb-6">
+                  {destination.highlights.slice(0, 3).map((highlight, idx) => (
+                    <div key={idx} className="text-sm text-muted-foreground flex items-center">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
+                      {highlight}
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA Buttons */}
+                <div className="space-y-2">
+                  <Button 
+                    className="w-full group/btn hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDestinationClick(destination);
+                    }}
+                  >
+                    Ver Detalhes
+                    <ChevronRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full text-sm hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-[1.02] transition-all duration-300"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Aqui você pode adicionar a lógica para abrir um modal de orçamento
+                      console.log('Solicitar orçamento para:', destination.name);
+                    }}
+                  >
+                    <Calculator className="h-4 w-4 mr-2" />
+                    Fazer Orçamento
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16 animate-fade-in-up">
-          <Button className="btn-accent hover-glow group relative overflow-hidden">
-            <Plane className="h-5 w-5 mr-2 transition-all duration-500 ease-out group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:scale-110" />
-            <span className="relative z-10">Ver Todos os Pacotes & Destinos</span>
-            {/* Flying plane animation */}
-            <Plane className="h-5 w-5 absolute opacity-0 -translate-x-12 -translate-y-12 group-hover:opacity-100 group-hover:translate-x-[200px] group-hover:translate-y-[200px] transition-all duration-1000 ease-out pointer-events-none text-white/30" />
+        <div className="text-center animate-fade-in-up">
+          <Button className="btn-accent hover-glow">
+            <MapPin className="h-5 w-5 mr-2" />
+            Ver Todos os Destinos
           </Button>
         </div>
       </div>
