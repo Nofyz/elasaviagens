@@ -166,41 +166,31 @@ const PackagesSection = () => {
           </p>
         </div>
 
-        {/* Navigation Controls */}
-        {destinations.length > destinationsPerView && (
-          <div className="flex justify-between items-center mb-8">
+        {/* Destinations Grid with Navigation */}
+        <div className="relative mb-12">
+          {/* Left Arrow */}
+          {destinations.length > destinationsPerView && (
             <button
               onClick={prevSlide}
-              className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
             >
               <ChevronLeft className="h-6 w-6 text-primary" />
             </button>
-            
-            <div className="flex gap-2">
-              {Array.from({ length: Math.ceil(destinations.length / destinationsPerView) }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index * destinationsPerView)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    Math.floor(currentIndex / destinationsPerView) === index
-                      ? 'bg-primary scale-125'
-                      : 'bg-white/30 hover:bg-white/50'
-                  }`}
-                />
-              ))}
-            </div>
+          )}
 
+          {/* Right Arrow */}
+          {destinations.length > destinationsPerView && (
             <button
               onClick={nextSlide}
-              className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110"
             >
               <ChevronRight className="h-6 w-6 text-primary" />
             </button>
-          </div>
-        )}
+          )}
 
-        {/* Destinations Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {/* Cards Container */}
+          <div className={`${destinations.length > destinationsPerView ? 'px-16' : ''}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {visibleItems.map((destination, index) => (
             <div 
               key={destination.id}
@@ -288,6 +278,15 @@ const PackagesSection = () => {
                   </div>
                 </div>
 
+                {/* Description */}
+                {destination.description && (
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                      {destination.description}
+                    </p>
+                  </div>
+                )}
+
                 {/* Included Items */}
                 {destination.included_items && destination.included_items.length > 0 && (
                   <div className="mb-4">
@@ -340,6 +339,8 @@ const PackagesSection = () => {
               </div>
             </div>
           ))}
+            </div>
+          </div>
         </div>
 
         {/* Call to Action */}

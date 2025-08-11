@@ -137,47 +137,33 @@ const DestinationsSection = () => {
           </p>
         </div>
 
-        {/* Navigation Controls */}
-        <div className="flex justify-between items-center mb-8">
+        {/* Destinations Grid with Navigation */}
+        <div className="relative mb-12">
+          {/* Left Arrow */}
           <button
             onClick={prevGroup}
             disabled={isAnimating}
-            className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="h-6 w-6 text-primary" />
           </button>
-          
-          <div className="flex gap-2">
-            {Array.from({ length: totalGroups }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  if (!isAnimating) {
-                    setIsAnimating(true);
-                    setCurrentGroup(index);
-                    setTimeout(() => setIsAnimating(false), 500);
-                  }
-                }}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentGroup
-                    ? 'bg-primary scale-125'
-                    : 'bg-white/30 hover:bg-white/50'
-                }`}
-              />
-            ))}
-          </div>
 
+          {/* Right Arrow */}
           <button
             onClick={nextGroup}
             disabled={isAnimating}
-            className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="h-6 w-6 text-primary" />
           </button>
-        </div>
 
-        {/* Destinations Grid */}
-        <div className="relative overflow-hidden mb-12">
+          {/* Cards Container */}
+          <div className="px-16">
+            <div 
+              className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 ease-in-out ${
+                isAnimating ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
+              }`}
+            >
           <div 
             className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 ease-in-out ${
               isAnimating ? 'opacity-0 transform translate-x-4' : 'opacity-100 transform translate-x-0'
@@ -265,14 +251,29 @@ const DestinationsSection = () => {
                   </div>
                 </div>
 
+                {/* Description */}
+                {destination.description && (
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground overflow-hidden text-ellipsis" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                      {destination.description}
+                    </p>
+                  </div>
+                )}
+
                 {/* Highlights */}
                 <div className="space-y-1 mb-6">
-                  {destination.highlights.map((highlight, idx) => (
-                    <div key={idx} className="text-sm text-muted-foreground flex items-center">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
-                      {highlight}
+                  {destination.highlights && destination.highlights.length > 0 ? (
+                    destination.highlights.map((highlight, idx) => (
+                      <div key={idx} className="text-sm text-muted-foreground flex items-center">
+                        <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
+                        {highlight}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm text-muted-foreground">
+                      Destino incrível no Nordeste brasileiro
                     </div>
-                  ))}
+                  )}
                 </div>
 
                 {/* CTA Button */}
@@ -289,6 +290,7 @@ const DestinationsSection = () => {
               </div>
             </div>
             ))}
+            </div>
           </div>
         </div>
 

@@ -6,12 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, ArrowLeft, Save, Plus, X } from 'lucide-react';
-import { destinationsApi } from '@/lib/supabase';
-import type { Database } from '@/integrations/supabase/types';
-import { Badge } from '@/components/ui/badge';
-
-type Destination = Database['public']['Tables']['destinations']['Row'];
+import { Loader2, ArrowLeft, Save } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const EditDestination: React.FC = () => {
   const navigate = useNavigate();
@@ -19,25 +15,21 @@ export const EditDestination: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [destination, setDestination] = useState<Partial<Destination>>({
+  const [destination, setDestination] = useState({
     name: '',
     location: '',
     description: '',
     price: 0,
     duration: 0,
     image_url: '',
-    highlights: [],
+    highlights: [] as string[],
     min_people: 1,
     max_people: 10,
     rating: 0,
     review_count: 0,
-    included_items: [],
+    included_items: [] as string[],
     original_price: 0
   });
-
-  // Estados para gerenciar arrays
-  const [highlightsInput, setHighlightsInput] = useState('');
-  const [includedItemsInput, setIncludedItemsInput] = useState('');
 
   useEffect(() => {
     if (id) {
@@ -48,9 +40,39 @@ export const EditDestination: React.FC = () => {
   const loadDestination = async () => {
     try {
       setLoading(true);
-      const data = await destinationsApi.getById(id!);
+      console.log('Carregando destino com ID:', id);
+      
+      const { data, error } = await supabase
+        .from('destinations')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      console.log('Resposta do Supabase:', { data, error });
+      
+      if (error) {
+        console.error('Erro do Supabase:', error);
+        setError('Erro ao carregar destino: ' + error.message);
+        return;
+      }
+      
       if (data) {
-        setDestination(data);
+        console.log('Destino carregado:', data);
+        setDestination({
+          name: data.name || '',
+          location: data.location || '',
+          description: data.description || '',
+          price: data.price || 0,
+          duration: data.duration || 0,
+          image_url: data.image_url || '',
+          highlights: data.highlights || [],
+          min_people: data.min_people || 1,
+          max_people: data.max_people || 10,
+          rating: data.rating || 0,
+          review_count: data.review_count || 0,
+          included_items: data.included_items || [],
+          original_price: data.original_price || 0
+        });
       } else {
         setError('Destino não encontrado');
       }
@@ -70,7 +92,77 @@ export const EditDestination: React.FC = () => {
       setSaving(true);
       setError(null);
 
-      await destinationsApi.update(id, destination as any);
+      console.log('=== INÍCIO DA ATUALIZAÇÃO ===');
+      console.log('ID do destino:', id);
+      console.log('Dados atuais:', destination);
+      
+      // Remover campos que podem causar problemas
+      const updateData = {
+        name: destination.name,
+        location: destination.location,
+        description: destination.description,
+        price: destination.price,
+        duration: destination.duration,
+        image_url: destination.image_url,
+        min_people: destination.min_people,
+        max_people: destination.max_people,
+        rating: destination.rating,
+        review_count: destination.review_count,
+        original_price: destination.original_price
+      };
+      
+      console.log('Dados para atualização:', updateData);
+      
+      // Primeiro, vamos verificar se o destino existe
+      console.log('Verificando se o destino existe...');
+      const { data: checkData, error: checkError } = await supabase
+        .from('destinations')
+        .select('id, name')
+        .eq('id', id)
+        .single();
+      
+      console.log('Verificação de existência:', { checkData, checkError });
+      
+      if (checkError) {
+        console.error('Erro ao verificar destino:', checkError);
+        setError('Destino não encontrado no banco');
+        return;
+      }
+      
+      // Agora vamos fazer a atualização
+      console.log('Fazendo a atualização...');
+      const { data, error } = await supabase
+        .from('destinations')
+        .update(updateData)
+        .eq('id', id);
+      
+      console.log('Resposta da atualização:', { data, error });
+      
+      if (error) {
+        console.error('Erro do Supabase na atualização:', error);
+        setError('Erro ao atualizar destino: ' + error.message);
+        return;
+      }
+      
+      // Vamos verificar se a atualização foi bem-sucedida
+      console.log('Verificando se a atualização foi bem-sucedida...');
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('destinations')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      console.log('Verificação pós-atualização:', { verifyData, verifyError });
+      
+      if (verifyError) {
+        console.error('Erro ao verificar atualização:', verifyError);
+        setError('Erro ao verificar se a atualização foi bem-sucedida');
+        return;
+      }
+      
+      console.log('=== ATUALIZAÇÃO CONCLUÍDA ===');
+      console.log('Dados finais no banco:', verifyData);
+      
       alert('Destino atualizado com sucesso!');
       navigate('/admin/dashboard');
     } catch (error) {
@@ -81,45 +173,10 @@ export const EditDestination: React.FC = () => {
     }
   };
 
-  const handleChange = (field: keyof Destination, value: any) => {
+  const handleChange = (field: string, value: any) => {
     setDestination(prev => ({
       ...prev,
       [field]: value
-    }));
-  };
-
-  // Funções para gerenciar arrays
-  const addHighlight = () => {
-    if (highlightsInput.trim()) {
-      setDestination(prev => ({
-        ...prev,
-        highlights: [...(prev.highlights || []), highlightsInput.trim()]
-      }));
-      setHighlightsInput('');
-    }
-  };
-
-  const removeHighlight = (index: number) => {
-    setDestination(prev => ({
-      ...prev,
-      highlights: prev.highlights?.filter((_, i) => i !== index) || []
-    }));
-  };
-
-  const addIncludedItem = () => {
-    if (includedItemsInput.trim()) {
-      setDestination(prev => ({
-        ...prev,
-        included_items: [...(prev.included_items || []), includedItemsInput.trim()]
-      }));
-      setIncludedItemsInput('');
-    }
-  };
-
-  const removeIncludedItem = (index: number) => {
-    setDestination(prev => ({
-      ...prev,
-      included_items: prev.included_items?.filter((_, i) => i !== index) || []
     }));
   };
 
@@ -195,7 +252,7 @@ export const EditDestination: React.FC = () => {
                   <Label htmlFor="description">Descrição</Label>
                   <Textarea
                     id="description"
-                    value={destination.description || ''}
+                    value={destination.description}
                     onChange={(e) => handleChange('description', e.target.value)}
                     placeholder="Descreva o destino..."
                     rows={4}
@@ -220,7 +277,7 @@ export const EditDestination: React.FC = () => {
                     <Input
                       id="original_price"
                       type="number"
-                      value={destination.original_price || 0}
+                      value={destination.original_price}
                       onChange={(e) => handleChange('original_price', Number(e.target.value))}
                       placeholder="0"
                     />
@@ -245,7 +302,7 @@ export const EditDestination: React.FC = () => {
                     <Input
                       id="min_people"
                       type="number"
-                      value={destination.min_people || 1}
+                      value={destination.min_people}
                       onChange={(e) => handleChange('min_people', Number(e.target.value))}
                       placeholder="1"
                       min="1"
@@ -257,7 +314,7 @@ export const EditDestination: React.FC = () => {
                     <Input
                       id="max_people"
                       type="number"
-                      value={destination.max_people || 10}
+                      value={destination.max_people}
                       onChange={(e) => handleChange('max_people', Number(e.target.value))}
                       placeholder="10"
                       min="1"
@@ -274,7 +331,7 @@ export const EditDestination: React.FC = () => {
                       step="0.1"
                       min="0"
                       max="5"
-                      value={destination.rating || 0}
+                      value={destination.rating}
                       onChange={(e) => handleChange('rating', Number(e.target.value))}
                       placeholder="4.5"
                     />
@@ -285,7 +342,7 @@ export const EditDestination: React.FC = () => {
                     <Input
                       id="review_count"
                       type="number"
-                      value={destination.review_count || 0}
+                      value={destination.review_count}
                       onChange={(e) => handleChange('review_count', Number(e.target.value))}
                       placeholder="0"
                       min="0"
@@ -297,78 +354,10 @@ export const EditDestination: React.FC = () => {
                   <Label htmlFor="image_url">URL da Imagem</Label>
                   <Input
                     id="image_url"
-                    value={destination.image_url || ''}
+                    value={destination.image_url}
                     onChange={(e) => handleChange('image_url', e.target.value)}
                     placeholder="https://exemplo.com/imagem.jpg"
                   />
-                </div>
-
-                {/* Destaques */}
-                <div className="space-y-4">
-                  <Label>Destaques do Destino</Label>
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Input
-                        value={highlightsInput}
-                        onChange={(e) => setHighlightsInput(e.target.value)}
-                        placeholder="Adicionar destaque..."
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHighlight())}
-                      />
-                      <Button type="button" onClick={addHighlight} size="sm">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    {destination.highlights && destination.highlights.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {destination.highlights.map((highlight, index) => (
-                          <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                            {highlight}
-                            <button
-                              type="button"
-                              onClick={() => removeHighlight(index)}
-                              className="ml-1 hover:text-destructive"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Itens Inclusos */}
-                <div className="space-y-4">
-                  <Label>Itens Inclusos</Label>
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Input
-                        value={includedItemsInput}
-                        onChange={(e) => setIncludedItemsInput(e.target.value)}
-                        placeholder="Adicionar item incluso..."
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIncludedItem())}
-                      />
-                      <Button type="button" onClick={addIncludedItem} size="sm">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    {destination.included_items && destination.included_items.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {destination.included_items.map((item, index) => (
-                          <Badge key={index} variant="outline" className="flex items-center gap-1">
-                            {item}
-                            <button
-                              type="button"
-                              onClick={() => removeIncludedItem(index)}
-                              className="ml-1 hover:text-destructive"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
 
                 <div className="flex gap-4 pt-4">

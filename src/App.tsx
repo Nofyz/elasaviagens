@@ -24,6 +24,7 @@ import PermissionTest from "./components/PermissionTest";
 import RLSFix from "./components/RLSFix";
 import ErrorBoundary from "./components/ErrorBoundary";
 
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/destinations/edit/:id" element={<EditDestination />} />
+
           <Route path="/teste-deletar" element={<TestDelete />} />
           <Route path="/teste-permissoes" element={<PermissionTest />} />
           <Route path="/corrigir-rls" element={<RLSFix />} />
