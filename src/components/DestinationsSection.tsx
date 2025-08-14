@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { MapPin, Star, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +69,13 @@ const DestinationsSection = () => {
     
     // Se não tem imagem, usa uma imagem padrão
     return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop';
+  };
+
+  const openWhatsAppWithDestination = (destination: Destination) => {
+    const phone = '5519998020759';
+    const message = `Olá! Tenho interesse em fazer um orçamento para o destino ${destination.name}. Poderiam me enviar mais informações?`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
   };
 
   if (loading) {
@@ -172,7 +179,7 @@ const DestinationsSection = () => {
             {getCurrentDestinations().map((destination, index) => (
             <div 
               key={destination.id}
-              className="card-destination hover-lift cursor-pointer animate-scale-in group"
+              className="card-destination hover-lift cursor-pointer animate-scale-in group h-full flex flex-col"
               style={{ animationDelay: `${index * 0.1}s` }}
               onClick={() => handleDestinationClick(destination)}
             >
@@ -222,7 +229,7 @@ const DestinationsSection = () => {
               </div>
 
               {/* Card Content */}
-              <div className="p-6">
+              <div className="p-6 flex flex-col h-full">
                 {/* Location & Rating */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center text-muted-foreground">
@@ -261,7 +268,7 @@ const DestinationsSection = () => {
                 )}
 
                 {/* Highlights */}
-                <div className="space-y-1 mb-6">
+                <div className="space-y-1">
                   {destination.highlights && destination.highlights.length > 0 ? (
                     destination.highlights.map((highlight, idx) => (
                       <div key={idx} className="text-sm text-muted-foreground flex items-center">
@@ -278,10 +285,10 @@ const DestinationsSection = () => {
 
                 {/* CTA Button */}
                 <Button 
-                  className="w-full group-hover:bg-primary/90 transition-all duration-300"
+                  className="w-full group-hover:bg-primary/90 transition-all duration-300 mt-auto"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDestinationClick(destination);
+                    openWhatsAppWithDestination(destination);
                   }}
                 >
                   Ver Detalhes
@@ -296,9 +303,11 @@ const DestinationsSection = () => {
 
         {/* Call to Action */}
         <div className="text-center animate-fade-in-up">
-          <Button className="btn-accent hover-glow">
-            <MapPin className="h-5 w-5 mr-2" />
-            Ver Todos os Destinos
+          <Button asChild className="btn-explore-destinations">
+            <Link to="/loja">
+              <MapPin className="h-5 w-5 mr-2 icon-shift" />
+              Ver Todos os Destinos
+            </Link>
           </Button>
         </div>
       </div>

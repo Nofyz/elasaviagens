@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { MapPin, Star, Clock, Heart, ChevronRight, ChevronLeft, Users, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -120,6 +120,13 @@ const PackagesSection = () => {
 
   const visibleItems = destinations.slice(currentIndex, currentIndex + destinationsPerView);
 
+  const openWhatsAppWithDestination = (destination: Destination) => {
+    const phone = '5519998020759';
+    const message = `Olá! Tenho interesse em fazer um orçamento para o destino ${destination.name}. Poderiam me enviar mais informações?`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
   if (loading) {
     return (
       <section id="pacotes" className="py-20 bg-gradient-to-br from-muted/20 via-background to-muted/30">
@@ -194,7 +201,7 @@ const PackagesSection = () => {
           {visibleItems.map((destination, index) => (
             <div 
               key={destination.id}
-              className="card-destination hover-lift cursor-pointer animate-scale-in group"
+              className="card-destination hover-lift cursor-pointer animate-scale-in group h-full flex flex-col"
               style={{ animationDelay: `${index * 0.1}s` }}
               onClick={() => handleDestinationClick(destination)}
             >
@@ -248,7 +255,7 @@ const PackagesSection = () => {
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-6 flex flex-col h-full">
                 {/* Location & Rating */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center text-muted-foreground">
@@ -302,7 +309,7 @@ const PackagesSection = () => {
                 )}
 
                 {/* Highlights */}
-                <div className="space-y-1 mb-6">
+                <div className="space-y-1">
                   {destination.highlights.slice(0, 3).map((highlight, idx) => (
                     <div key={idx} className="text-sm text-muted-foreground flex items-center">
                       <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2" />
@@ -312,12 +319,12 @@ const PackagesSection = () => {
                 </div>
 
                 {/* CTA Buttons */}
-                <div className="space-y-2">
+                <div className="space-y-2 mt-auto">
                   <Button 
                     className="w-full group/btn hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDestinationClick(destination);
+                      openWhatsAppWithDestination(destination);
                     }}
                   >
                     Ver Detalhes
@@ -328,8 +335,7 @@ const PackagesSection = () => {
                     className="w-full text-sm hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-[1.02] transition-all duration-300"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // Aqui você pode adicionar a lógica para abrir um modal de orçamento
-                      console.log('Solicitar orçamento para:', destination.name);
+                      openWhatsAppWithDestination(destination);
                     }}
                   >
                     <Calculator className="h-4 w-4 mr-2" />
@@ -345,9 +351,11 @@ const PackagesSection = () => {
 
         {/* Call to Action */}
         <div className="text-center animate-fade-in-up">
-          <Button className="btn-accent hover-glow">
-            <MapPin className="h-5 w-5 mr-2" />
-            Ver Todos os Destinos
+          <Button asChild className="btn-explore-destinations">
+            <Link to="/loja">
+              <MapPin className="h-5 w-5 mr-2 icon-shift" />
+              Ver Todos os Destinos
+            </Link>
           </Button>
         </div>
       </div>

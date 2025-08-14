@@ -214,6 +214,13 @@ const Shop = () => {
     return destination.image_url || fallbackImages[index % fallbackImages.length];
   };
 
+  const openWhatsAppWithDestination = (destination: Destination) => {
+    const phone = '5519998020759';
+    const message = `Olá! Tenho interesse em fazer um orçamento para o destino ${destination.name}. Poderiam me enviar mais informações?`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-muted/20 via-background to-muted/30">
@@ -495,7 +502,7 @@ const Shop = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredDestinations.map((destination, index) => (
-                  <Card key={destination.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white">
+                  <Card key={destination.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm hover:bg-white h-full flex flex-col">
                     {/* Image */}
                     <div className="relative h-48 overflow-hidden rounded-t-xl">
                       <img
@@ -546,7 +553,7 @@ const Shop = () => {
                     </div>
 
                     {/* Content */}
-                    <CardContent className="p-6 flex-1">
+                    <CardContent className="p-6 flex-1 flex flex-col h-full">
                       <div>
                         {/* Title & Location */}
                         <h3 className="font-montserrat font-bold text-xl mb-2 group-hover:text-primary transition-colors duration-300">
@@ -606,13 +613,23 @@ const Shop = () => {
 
                       {/* Action Buttons */}
                       <div className="space-y-2 mt-auto">
-                        <Button className="w-full group/btn hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300">
+                        <Button 
+                          className="w-full group/btn hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            openWhatsAppWithDestination(destination);
+                          }}
+                        >
                           <Plane className="h-4 w-4 mr-2 group-hover/btn:rotate-12 transition-transform duration-300" />
                           Ver Detalhes
                         </Button>
                         <Button 
                           variant="outline" 
                           className="w-full text-sm hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-md hover:scale-[1.02] transition-all duration-300"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            openWhatsAppWithDestination(destination);
+                          }}
                         >
                           Fazer Orçamento
                         </Button>

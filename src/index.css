@@ -138,6 +138,33 @@ All colors MUST be HSL.
     @apply bg-accent text-accent-foreground hover:bg-accent/90 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-[var(--shadow-glow)];
   }
 
+  /* Home CTA button: "Ver Todos os Destinos" - azul com hover suave */
+  .btn-explore-destinations {
+    @apply px-6 py-3 rounded-lg font-semibold text-white shadow-lg;
+    position: relative;
+    background: hsl(var(--ocean-blue));
+    transition:
+      background-color 260ms ease,
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 260ms ease,
+      filter 260ms ease;
+  }
+  .btn-explore-destinations:hover,
+  .btn-explore-destinations:focus-visible {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 14px 30px -12px hsl(var(--ocean-blue) / 0.35);
+    filter: brightness(1.06);
+  }
+  .btn-explore-destinations:active {
+    transform: translateY(0) scale(0.99);
+  }
+  .btn-explore-destinations .icon-shift {
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .btn-explore-destinations:hover .icon-shift {
+    transform: translateX(3px);
+  }
+
   /* Card Styles */
   .card-destination {
     @apply bg-card text-card-foreground rounded-xl overflow-hidden shadow-lg hover:shadow-[var(--shadow-warm)] transition-all duration-500 hover:scale-[1.02] cursor-pointer backdrop-blur-sm;

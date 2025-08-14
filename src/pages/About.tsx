@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Award, Heart, Plane, Calendar, Phone, Mail } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import heroJericoacoaraDunes from '@/assets/hero-jericoacoara-dunes.jpg';
 
 const About = () => {
   return (
@@ -58,8 +59,8 @@ const About = () => {
           
           <div className="relative">
             <img 
-              src="https://images.unsplash.com/photo-1582735689369-4fe89db0853c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              alt="Praia de Porto de Galinhas - Pernambuco"
+              src={heroJericoacoaraDunes}
+              alt="Jericoacoara - Dunas douradas e lagoas azul-turquesa"
               className="w-full h-96 object-cover rounded-2xl shadow-lg"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
